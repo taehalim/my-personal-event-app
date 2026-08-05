@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --background: #f8f5ff; --foreground: #1d1728; --primary: #7c4dce; --muted: #766d82; --border: #e5def0; --card: #fff; --danger: #c94b62; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
+a { color: inherit; text-decoration: none; }
+button, input, textarea, select { font: inherit; }
+.container { width: min(1280px, calc(100% - 40px)); margin: 0 auto; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 8px 30px rgba(55, 28, 92, .06); }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 12px; background: var(--primary); color: white; cursor: pointer; font-weight: 700; }
+.button.secondary { background: #eee9f7; color: var(--foreground); }
+.button.danger { background: var(--danger); }
+.button:disabled { opacity: .55; cursor: wait; }
+.field { display: grid; gap: 7px; }
+.field label { font-size: 14px; font-weight: 700; }
+.field input, .field textarea, .field select { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: white; color: var(--foreground); }
+.field textarea { min-height: 150px; resize: vertical; }
+.muted { color: var(--muted); }
+.error { color: var(--danger); font-size: 14px; }
+.pill { display: inline-flex; border-radius: 999px; padding: 5px 10px; background: #eee9f7; font-size: 12px; font-weight: 700; }
+@media (max-width: 768px) { .container { width: min(100% - 40px, 600px); } }

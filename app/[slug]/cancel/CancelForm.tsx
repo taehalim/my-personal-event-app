@@ -1,0 +1,3 @@
+'use client';
+import { useState } from 'react';
+export default function CancelForm({slug,token}:{slug:string;token:string}){const [result,setResult]=useState('');const [loading,setLoading]=useState(false);return <button className="button danger" disabled={!token||loading} onClick={async()=>{setLoading(true);const res=await fetch('/api/register/cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,token})});const json=await res.json();setResult(res.ok?'참가 신청이 취소되었습니다.':json.error?.message??'취소에 실패했습니다.');setLoading(false);}}>{result|| (loading?'취소 중...':'참가 취소하기')}</button>}

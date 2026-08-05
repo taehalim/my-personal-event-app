@@ -1,0 +1,3 @@
+'use client';
+import { useState } from 'react';
+export default function RegistrationActions({id,status}:{id:string;status:string}){const [current,setCurrent]=useState(status);const [loading,setLoading]=useState(false);const next=current==='pending'?['approved','rejected']:current==='approved'?['cancelled']:[];return <div style={{display:'flex',gap:8}}>{next.map(value=><button key={value} className={`button ${value==='rejected'||value==='cancelled'?'danger':'secondary'}`} disabled={loading} onClick={async()=>{setLoading(true);const res=await fetch(`/api/admin/registrations/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:value})});if(res.ok)setCurrent(value);setLoading(false);}}>{value}</button>)}</div>}
