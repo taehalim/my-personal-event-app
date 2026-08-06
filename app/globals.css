@@ -23,6 +23,13 @@ button, input, textarea, select { font: inherit; }
 .events-directory { width: min(780px, calc(100% - 24px)); margin: 0 auto; padding: 32px 0 48px; }
 .events-directory-header { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 32px; text-align: center; }
 .events-directory-header h1 { margin: 0; font-size: clamp(32px, 4vw, 42px); letter-spacing: -.055em; }
+.admin-events-header { position: relative; }
+.admin-create-button { position: absolute; top: 0; right: 0; min-height: 38px; padding: 0 14px; border-radius: 9px; font-size: 13px; }
+.admin-directory-card { cursor: default; }
+.admin-directory-card .admin-status { margin-top: 8px; }
+.admin-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin-top: auto; }
+.admin-attendee-count { color: #888; font-size: 12px; }
+.admin-manage-button { min-height: 32px; padding: 0 11px; border-radius: 7px; font-size: 12px; }
 .event-tabs { display: flex; align-items: center; gap: 22px; }
 .event-tabs button { border: 0; padding: 0; background: transparent; color: #b5b5b5; font-size: 14px; font-weight: 650; cursor: pointer; }
 .event-tabs button.active { color: var(--foreground); }
@@ -93,5 +100,5 @@ button, input, textarea, select { font: inherit; }
 .auth-card h1 { margin: 4px 0 0; font-size: 28px; letter-spacing: -.04em; }
 .auth-card p { margin: 0 0 6px; }
 @media (max-width: 768px) { .container { width: min(100% - 40px, 600px); } }
-@media (max-width: 720px) { .events-directory { width: min(100% - 20px, 520px); padding-top: 24px; } .events-directory-header { margin-bottom: 26px; } .events-directory-header h1 { font-size: 32px; } .event-tabs { gap: 18px; } .event-row { grid-template-columns: 54px 8px minmax(0, 1fr); gap: 6px; } .event-date { padding-top: 10px; } .event-date strong { font-size: 15px; } .event-date span { font-size: 11px; } .event-dot::before { width: 8px; height: 8px; margin-top: 15px; } .event-dot::after { top: 25px; } .event-card { grid-template-columns: 1fr; gap: 12px; min-height: 0; padding: 13px; border-radius: 12px; } .event-card-image { order: -1; min-height: 118px; } .event-card h2 { font-size: 20px; } .event-host, .event-location { font-size: 13px; } }
+@media (max-width: 720px) { .events-directory { width: min(100% - 20px, 520px); padding-top: 24px; } .events-directory-header { margin-bottom: 26px; } .events-directory-header h1 { font-size: 32px; } .event-tabs { gap: 18px; } .admin-create-button { position: static; order: 3; align-self: stretch; min-height: 38px; margin-top: 2px; } .admin-events-header .event-tabs { order: 2; } .event-row { grid-template-columns: 54px 8px minmax(0, 1fr); gap: 6px; } .event-date { padding-top: 10px; } .event-date strong { font-size: 15px; } .event-date span { font-size: 11px; } .event-dot::before { width: 8px; height: 8px; margin-top: 15px; } .event-dot::after { top: 25px; } .event-card { grid-template-columns: 1fr; gap: 12px; min-height: 0; padding: 13px; border-radius: 12px; } .event-card-image { order: -1; min-height: 118px; } .event-card h2 { font-size: 20px; } .event-host, .event-location { font-size: 13px; } }
 @media (max-width: 720px) { .admin-shell { width: min(100% - 20px, 560px); padding-top: 24px; } .admin-header, .admin-detail-header { align-items: flex-start; flex-direction: column; } .admin-header h1 { font-size: 32px; } .admin-header > .button { align-self: stretch; } .admin-form-grid { grid-template-columns: 1fr; } .admin-filter-card { flex-wrap: wrap; } .admin-filter-card input { flex-basis: 100%; } .admin-filter-card select, .admin-filter-card button { flex: 1; } .admin-event-card { align-items: flex-start; } .admin-event-count { margin-left: auto; } .auth-shell { width: min(100% - 28px, 420px); padding-top: 32px; } }
