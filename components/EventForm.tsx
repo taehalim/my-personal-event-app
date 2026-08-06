@@ -19,7 +19,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const router = useRouter();
   const [title, setTitle] = useState(event?.title ?? '');
   const [description, setDescription] = useState(event?.description ?? '');
-  const [hostName, setHostName] = useState(event?.host_name ?? '');
+  const [hostName] = useState(event?.host_name ?? 'Inha');
   const [startAt, setStartAt] = useState(event?.start_at?.slice(0, 16) ?? '');
   const [endAt, setEndAt] = useState(event?.end_at?.slice(0, 16) ?? '');
   const [registrationOpenAt, setRegistrationOpenAt] = useState(event?.registration_open_at?.slice(0, 16) ?? '');
@@ -96,46 +96,31 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   };
 
   return <form onSubmit={save} className="admin-form event-form">
-    <section className="admin-form-section event-form-section">
-      <div className="event-form-section-heading"><span className="event-form-step">01</span><div><h2>기본 정보</h2><p>이벤트를 한눈에 소개할 정보를 입력해 주세요.</p></div></div>
-      <div className="event-form-fields">
-        <div className="field"><label htmlFor="event-title">이벤트 제목 *</label><input id="event-title" required maxLength={120} value={title} onChange={inputEvent => setTitle(inputEvent.target.value)} placeholder="예: 바이브코딩 클럽" /></div>
-        <div className="field"><label htmlFor="event-host">호스트명 *</label><input id="event-host" required value={hostName} onChange={inputEvent => setHostName(inputEvent.target.value)} placeholder="예: Inha 개발자 모임" /></div>
-        <div className="field event-form-field-wide"><label htmlFor="event-description">이벤트 설명 *</label><textarea id="event-description" required value={description} onChange={inputEvent => setDescription(inputEvent.target.value)} placeholder="참가자가 이벤트를 이해하는 데 필요한 내용을 적어 주세요." /></div>
-        <div className="field event-cover-field"><label htmlFor="event-cover">대표 이미지</label><div className="event-cover-row"><div className="event-cover-preview">{coverPath ? <Image src={publicCoverUrl(coverPath) ?? ''} alt="현재 대표 이미지" fill sizes="112px" /> : <span aria-hidden="true">이미지</span>}</div><div><label htmlFor="event-cover" className="event-file-button">이미지 선택</label><input id="event-cover" className="event-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } setCoverFile(file); }} /><p className="field-hint">JPG, PNG, WEBP · 최대 10MB</p>{coverFile && <p className="field-hint">선택됨: {coverFile.name}</p>}</div></div></div>
+    <div className="event-form-workspace">
+      <aside className="event-form-media-panel">
+        <div className="event-cover-preview event-cover-preview-large">{coverPath ? <Image src={publicCoverUrl(coverPath) ?? ''} alt="현재 대표 이미지" fill sizes="280px" /> : <span aria-hidden="true">대표 이미지</span>}</div>
+        <label htmlFor="event-cover" className="event-file-button event-file-button-wide">이미지 선택</label>
+        <input id="event-cover" className="event-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } setCoverFile(file); }} />
+        <p className="field-hint">JPG, PNG, WEBP · 최대 10MB</p>
+        {coverFile && <p className="field-hint">선택됨: {coverFile.name}</p>}
+      </aside>
+
+      <div className="event-form-main-panel">
+        <div className="event-form-status-row"><label className="event-status-select"><span>공개 상태</span><select aria-label="공개 상태" value={status} onChange={inputEvent => setStatus(inputEvent.target.value as 'draft' | 'published' | 'cancelled')}><option value="published">공개</option><option value="draft">비공개 초안</option><option value="cancelled">취소</option></select></label></div>
+        <div className="field event-title-field"><label htmlFor="event-title">이벤트 제목 *</label><input id="event-title" required maxLength={120} value={title} onChange={inputEvent => setTitle(inputEvent.target.value)} placeholder="예: 바이브코딩 클럽" /></div>
+        <div className="event-form-compact-block event-form-schedule-block"><div className="event-form-compact-heading"><strong>일정</strong><span>Asia/Seoul</span></div><div className="event-form-date-list"><div className="event-form-date-row"><span className="event-date-marker event-date-marker-start" aria-hidden="true" /><label htmlFor="event-start">시작 *</label><input id="event-start" required type="datetime-local" value={startAt} onChange={inputEvent => setStartAt(inputEvent.target.value)} /></div><div className="event-form-date-row"><span className="event-date-marker" aria-hidden="true" /><label htmlFor="event-end">종료 *</label><input id="event-end" required type="datetime-local" value={endAt} onChange={inputEvent => setEndAt(inputEvent.target.value)} /></div></div></div>
+
+        <div className="event-form-compact-block event-form-location-block"><div className="event-form-compact-heading"><strong>장소</strong><select aria-label="장소 유형" value={locationType} onChange={inputEvent => setLocationType(inputEvent.target.value as 'in_person' | 'online')}><option value="in_person">오프라인</option><option value="online">온라인</option></select></div>{locationType === 'in_person' ? <div className="field"><input id="event-location" required aria-label="장소" value={locationName} onChange={inputEvent => setLocationName(inputEvent.target.value)} placeholder="예: 인하대학교 60주년기념관" /></div> : <div className="field"><input id="event-location-url" required type="url" aria-label="온라인 링크" value={locationUrl} onChange={inputEvent => setLocationUrl(inputEvent.target.value)} placeholder="https://" /></div>}</div>
+
+        <div className="field event-description-field"><label htmlFor="event-description">이벤트 설명 *</label><textarea id="event-description" required value={description} onChange={inputEvent => setDescription(inputEvent.target.value)} placeholder="참가자가 이벤트를 이해하는 데 필요한 내용을 적어 주세요." /></div>
+
+        <section className="event-form-options"><div className="event-form-compact-heading"><strong>참가 설정</strong><span>선택 사항</span></div><div className="event-options-grid"><div className="field"><label htmlFor="event-capacity">정원</label><input id="event-capacity" type="number" min="1" value={capacity} onChange={inputEvent => setCapacity(inputEvent.target.value)} placeholder="무제한" /></div><div className="field"><label htmlFor="event-approval">승인 방식</label><select id="event-approval" value={approvalMode} onChange={inputEvent => setApprovalMode(inputEvent.target.value as 'auto' | 'manual')}><option value="auto">자동 승인</option><option value="manual">수동 승인</option></select></div></div><label className="event-checkbox"><input type="checkbox" checked={registrationEnabled} onChange={inputEvent => setRegistrationEnabled(inputEvent.target.checked)} /> 참가 신청 받기</label><details className="event-registration-advanced"><summary>신청 기간 설정 <span>{registrationOpenAt || registrationCloseAt ? '설정됨' : '기본값'}</span></summary><div className="event-options-grid"><div className="field"><label htmlFor="registration-open">신청 시작</label><input id="registration-open" type="datetime-local" value={registrationOpenAt} onChange={inputEvent => setRegistrationOpenAt(inputEvent.target.value)} /></div><div className="field"><label htmlFor="registration-close">신청 마감</label><input id="registration-close" type="datetime-local" value={registrationCloseAt} onChange={inputEvent => setRegistrationCloseAt(inputEvent.target.value)} /></div></div></details></section>
+
+        <details className="event-form-advanced" open={fieldsDraft.length > 0}><summary>신청 질문 <span>{fieldsDraft.length ? `${fieldsDraft.length}개` : '추가하지 않음'}</span></summary><div className="event-form-advanced-content"><div className="event-form-section-header"><span className="field-hint">참가 신청 때 받을 정보를 추가할 수 있어요.</span><button type="button" className="button secondary event-add-button" onClick={() => setFieldsDraft([...fieldsDraft, { type: 'text', label: '', description: '', placeholder: '', required: false, optionsText: '' }])}>+ 질문 추가</button></div>{fieldsDraft.map((field, index) => <div key={index} className="admin-question"><div className="admin-form-section-header"><strong>질문 {index + 1}</strong><button type="button" className="button secondary event-remove-button" onClick={() => setFieldsDraft(fieldsDraft.filter((_, fieldIndex) => fieldIndex !== index))}>삭제</button></div><div className="admin-form-grid"><div className="field"><label>유형</label><select value={field.type} onChange={inputEvent => updateField(index, { type: inputEvent.target.value as FieldType })}><option value="text">짧은 답변</option><option value="textarea">긴 답변</option><option value="select">선택</option><option value="checkbox">체크박스</option></select></div><div className="field"><label>질문</label><input required value={field.label} onChange={inputEvent => updateField(index, { label: inputEvent.target.value })} placeholder="예: 소속을 알려 주세요" /></div></div>{field.type === 'select' && <div className="field"><label>선택지</label><input required value={field.optionsText} placeholder="개발자:developer, 기획자:planner" onChange={inputEvent => updateField(index, { optionsText: inputEvent.target.value })} /></div>}<label className="event-checkbox"><input type="checkbox" checked={field.required} onChange={inputEvent => updateField(index, { required: inputEvent.target.checked })} /> 필수 질문</label></div>)}</div></details>
+
+        {error && <p className="error event-form-error">{error}</p>}
+        <div className="event-form-actions"><Link href={event ? `/admin/events/${event.id}` : '/admin'} className="button secondary">취소</Link><button className="button" disabled={loading}>{loading ? '저장 중...' : event ? '변경사항 저장' : '이벤트 만들기'}</button></div>
       </div>
-    </section>
-
-    <section className="admin-form-section event-form-section">
-      <div className="event-form-section-heading"><span className="event-form-step">02</span><div><h2>일정</h2><p>이벤트가 열리는 시간을 알려 주세요.</p></div></div>
-      <div className="admin-form-grid"><div className="field"><label htmlFor="event-start">시작 *</label><input id="event-start" required type="datetime-local" value={startAt} onChange={inputEvent => setStartAt(inputEvent.target.value)} /></div><div className="field"><label htmlFor="event-end">종료 *</label><input id="event-end" required type="datetime-local" value={endAt} onChange={inputEvent => setEndAt(inputEvent.target.value)} /></div></div>
-    </section>
-
-    <section className="admin-form-section event-form-section">
-      <div className="event-form-section-heading"><span className="event-form-step">03</span><div><h2>장소</h2><p>참가자가 어디로 가야 하는지 안내해 주세요.</p></div></div>
-      <div className="field"><label htmlFor="event-location-type">장소 유형</label><select id="event-location-type" value={locationType} onChange={inputEvent => setLocationType(inputEvent.target.value as 'in_person' | 'online')}><option value="in_person">오프라인</option><option value="online">온라인</option></select></div>
-      {locationType === 'in_person' ? <div className="field"><label htmlFor="event-location">장소 *</label><input id="event-location" required value={locationName} onChange={inputEvent => setLocationName(inputEvent.target.value)} placeholder="예: 인하대학교 60주년기념관" /></div> : <div className="field"><label htmlFor="event-location-url">온라인 링크 *</label><input id="event-location-url" required type="url" value={locationUrl} onChange={inputEvent => setLocationUrl(inputEvent.target.value)} placeholder="https://" /></div>}
-    </section>
-
-    <section className="admin-form-section event-form-section">
-      <div className="event-form-section-heading"><span className="event-form-step">04</span><div><h2>참가 설정</h2><p>신청 방식과 참가 인원을 설정해 주세요.</p></div></div>
-      <div className="admin-form-grid"><div className="field"><label htmlFor="event-capacity">정원</label><input id="event-capacity" type="number" min="1" value={capacity} onChange={inputEvent => setCapacity(inputEvent.target.value)} placeholder="무제한" /></div><div className="field"><label htmlFor="event-approval">승인 방식</label><select id="event-approval" value={approvalMode} onChange={inputEvent => setApprovalMode(inputEvent.target.value as 'auto' | 'manual')}><option value="auto">자동 승인</option><option value="manual">수동 승인</option></select></div></div>
-      <label className="event-checkbox"><input type="checkbox" checked={registrationEnabled} onChange={inputEvent => setRegistrationEnabled(inputEvent.target.checked)} /> 참가 신청 받기</label>
-      <div className="admin-form-grid"><div className="field"><label htmlFor="registration-open">신청 시작</label><input id="registration-open" type="datetime-local" value={registrationOpenAt} onChange={inputEvent => setRegistrationOpenAt(inputEvent.target.value)} /></div><div className="field"><label htmlFor="registration-close">신청 마감</label><input id="registration-close" type="datetime-local" value={registrationCloseAt} onChange={inputEvent => setRegistrationCloseAt(inputEvent.target.value)} /></div></div>
-    </section>
-
-    <section className="admin-form-section event-form-section">
-      <div className="event-form-section-heading"><span className="event-form-step">05</span><div><h2>신청 질문</h2><p>참가 신청 때 받을 정보를 추가할 수 있어요.</p></div></div>
-      <div className="event-form-section-header"><span className="field-hint">필요한 질문만 간결하게 구성해 보세요.</span><button type="button" className="button secondary event-add-button" onClick={() => setFieldsDraft([...fieldsDraft, { type: 'text', label: '', description: '', placeholder: '', required: false, optionsText: '' }])}>+ 질문 추가</button></div>
-      {fieldsDraft.length === 0 ? <p className="event-question-empty">추가된 질문이 없습니다.</p> : fieldsDraft.map((field, index) => <div key={index} className="admin-question"><div className="admin-form-section-header"><strong>질문 {index + 1}</strong><button type="button" className="button secondary event-remove-button" onClick={() => setFieldsDraft(fieldsDraft.filter((_, fieldIndex) => fieldIndex !== index))}>삭제</button></div><div className="admin-form-grid"><div className="field"><label>유형</label><select value={field.type} onChange={inputEvent => updateField(index, { type: inputEvent.target.value as FieldType })}><option value="text">짧은 답변</option><option value="textarea">긴 답변</option><option value="select">선택</option><option value="checkbox">체크박스</option></select></div><div className="field"><label>질문</label><input required value={field.label} onChange={inputEvent => updateField(index, { label: inputEvent.target.value })} placeholder="예: 소속을 알려 주세요" /></div></div>{field.type === 'select' && <div className="field"><label>선택지</label><input required value={field.optionsText} placeholder="개발자:developer, 기획자:planner" onChange={inputEvent => updateField(index, { optionsText: inputEvent.target.value })} /></div>}<label className="event-checkbox"><input type="checkbox" checked={field.required} onChange={inputEvent => updateField(index, { required: inputEvent.target.checked })} /> 필수 질문</label></div>)}
-    </section>
-
-    <section className="admin-form-section event-form-section event-visibility-section">
-      <div className="event-form-section-heading"><span className="event-form-step">06</span><div><h2>공개 상태</h2><p>이벤트를 바로 공개할지 선택해 주세요.</p></div></div>
-      <div className="field"><label htmlFor="event-status">상태</label><select id="event-status" value={status} onChange={inputEvent => setStatus(inputEvent.target.value as 'draft' | 'published' | 'cancelled')}><option value="published">공개</option><option value="draft">비공개 초안</option><option value="cancelled">취소</option></select></div>
-    </section>
-
-    {error && <p className="error event-form-error">{error}</p>}
-    <div className="event-form-actions"><Link href={event ? `/admin/events/${event.id}` : '/admin'} className="button secondary">취소</Link><button className="button" disabled={loading}>{loading ? '저장 중...' : event ? '변경사항 저장' : '이벤트 만들기'}</button></div>
+    </div>
   </form>;
 }

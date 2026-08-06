@@ -158,6 +158,68 @@ button, input, textarea, select { font: inherit; }
 .event-form-error { margin: 20px 0 0; }
 .event-form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 26px; }
 .event-form-actions .button { min-width: 112px; }
+.event-create-shell { width: min(1080px, calc(100% - 48px)); padding-top: 28px; }
+.event-create-shell .event-create-header { min-height: 20px; margin-bottom: 18px; }
+.event-create-shell .event-create-back { display: inline-flex; align-items: center; color: #777; font-size: 13px; }
+.event-form-workspace { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 32px; align-items: start; }
+.event-form-media-panel { padding-top: 2px; }
+.event-cover-preview-large { width: 280px; height: 280px; border-radius: 16px; background: #f1f1f1; }
+.event-cover-preview-large span { color: #999; font-size: 14px; }
+.event-file-button-wide { width: 100%; justify-content: center; margin-top: 12px; }
+.event-form-main-panel { display: grid; gap: 8px; min-width: 0; }
+.event-form-status-row { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.event-form-kicker { color: #777; font-size: 13px; font-weight: 700; letter-spacing: .05em; }
+.event-status-select { display: inline-flex; align-items: center; gap: 8px; color: #888; font-size: 12px; }
+.event-status-select select { width: auto; border: 0; border-radius: 8px; padding: 7px 9px; background: #f1f1f1; color: #555; font-size: 12px; font-weight: 700; }
+.event-title-field label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.event-title-field { display: block; }
+.event-title-field input { display: block; width: 100%; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; padding: 2px 0 9px; background: transparent; font-size: clamp(30px, 4vw, 44px); font-weight: 650; letter-spacing: -.055em; }
+.event-title-field input:focus { border-color: #171717; box-shadow: none; }
+.event-form-main-panel > .field:not(.event-title-field) input { padding: 7px 10px; }
+.event-host-field { gap: 4px; }
+.event-host-field label { color: #888; font-size: 11px; font-weight: 650; }
+.event-host-field input { border: 0; border-bottom: 1px solid #ededed; border-radius: 0; background: transparent; }
+.event-form-compact-block, .event-form-options, .event-form-advanced { border-radius: 12px; background: #f7f7f7; }
+.event-form-compact-block { display: grid; gap: 5px; padding: 8px 12px; }
+.event-form-compact-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.event-form-compact-heading strong { font-size: 14px; letter-spacing: -.02em; }
+.event-form-compact-heading span, .event-form-compact-heading select { color: #999; font-size: 12px; }
+.event-form-compact-heading select { border: 0; padding: 4px 0; background: transparent; text-align: right; }
+.event-form-date-grid, .event-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.event-form-date-list { display: grid; gap: 6px; }
+.event-form-date-row { position: relative; display: grid; grid-template-columns: 14px 40px minmax(0, 1fr); align-items: center; gap: 8px; }
+.event-form-date-row + .event-form-date-row::before { position: absolute; top: -8px; left: 6px; width: 1px; height: 8px; background: #d7d7d7; content: ''; }
+.event-form-date-row label { color: #777; font-size: 12px; font-weight: 650; }
+.event-form-date-row input { min-width: 0; }
+.event-date-marker { display: block; width: 9px; height: 9px; border: 2px solid #bfc3bf; border-radius: 50%; background: #f7f7f7; }
+.event-date-marker-start { border-color: #b4bbb4; background: #b4bbb4; }
+.event-form-compact-block .field, .event-form-options .field { gap: 5px; }
+.event-form-compact-block .field label, .event-form-options .field label { color: #888; font-size: 11px; font-weight: 650; }
+.event-form-compact-block input, .event-form-compact-block select, .event-form-options input, .event-form-options select { padding: 6px 9px; border-color: #e7e7e7; background: #fff; font-size: 13px; }
+.event-description-field { gap: 4px; }
+.event-description-field textarea { min-height: 50px; }
+.event-description-field label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.event-description-field textarea { border: 0; border-radius: 12px; padding: 10px 14px; background: #f7f7f7; }
+.event-form-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 10px; padding: 8px 12px; }
+.event-form-options > .event-form-compact-heading { grid-column: 1 / -1; }
+.event-form-options .event-options-grid { display: contents; }
+.event-form-options > .event-checkbox { grid-column: 3; align-self: end; }
+.event-form-options > .event-registration-advanced { grid-column: 1 / -1; }
+.event-form-options > .event-checkbox { margin: 0; }
+.event-form-advanced { padding: 0 14px; }
+.event-form-advanced summary { display: flex; align-items: center; justify-content: space-between; min-height: 40px; cursor: pointer; list-style: none; font-size: 14px; font-weight: 700; }
+.event-form-advanced summary::-webkit-details-marker { display: none; }
+.event-form-advanced summary span { color: #999; font-size: 12px; font-weight: 500; }
+.event-form-advanced-content { padding: 0 0 13px; }
+.event-form-advanced .event-form-section-header { margin-bottom: 10px; }
+.event-form-advanced .admin-question { padding-top: 12px; margin-top: 12px; }
+.event-registration-advanced { padding-top: 2px; }
+.event-registration-advanced summary { display: flex; align-items: center; justify-content: space-between; padding-top: 4px; color: #777; cursor: pointer; font-size: 12px; }
+.event-registration-advanced summary::-webkit-details-marker { display: none; }
+.event-registration-advanced summary span { color: #999; }
+.event-registration-advanced .event-options-grid { padding-top: 8px; }
+.event-form-actions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding-top: 2px; }
+.event-form-actions .button:last-child { width: 100%; }
 .auth-shell { width: min(440px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0 88px; }
 .auth-card { display: grid; gap: 16px; padding: 32px; margin-top: 22px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--card); box-shadow: var(--shadow-card); }
 .auth-card h1 { margin: 4px 0 0; font-size: 28px; letter-spacing: -.04em; }
@@ -168,3 +230,4 @@ button, input, textarea, select { font: inherit; }
 @media (max-width: 720px) { .admin-event-showcase-card { grid-template-columns: 1fr; min-height: 0; padding: 16px; } .admin-event-showcase-image { order: -1; min-height: 132px; } }
 @media (max-width: 720px) { .events-directory-header { margin-bottom: 28px; } .event-row { grid-template-columns: 54px 8px minmax(0, 1fr); gap: 8px; } .event-date strong { font-size: 15px; } .event-date span { font-size: 12px; } .admin-event-showcase-card { gap: 14px; border-radius: 14px; } .admin-event-time { font-size: 15px; } .admin-event-showcase-card h2 { margin: 9px 0 12px; font-size: 20px; } .admin-event-meta { font-size: 14px; } .admin-manage-button, .admin-participants-button { min-height: 36px; padding: 0 12px; font-size: 12px; } }
 @media (max-width: 720px) { .event-create-shell { width: min(100% - 28px, 560px); padding-top: 36px; } .event-create-kicker { margin-top: 20px; } .event-form-section { padding: 24px 0; } .event-form-section-heading { gap: 10px; margin-bottom: 18px; } .event-form-fields { grid-template-columns: 1fr; gap: 14px; } .event-form-field-wide, .event-cover-field { grid-column: auto; } .event-cover-row { align-items: flex-start; } .event-form-actions { justify-content: stretch; } .event-form-actions .button { flex: 1; min-width: 0; } }
+@media (max-width: 720px) { .event-create-shell { width: min(100% - 28px, 560px); } .event-form-workspace { grid-template-columns: 1fr; gap: 24px; } .event-form-media-panel { max-width: 280px; margin: 0 auto; } .event-cover-preview-large { width: min(280px, 100%); height: min(280px, 72vw); } .event-form-date-grid, .event-options-grid { grid-template-columns: 1fr; } .event-form-options { grid-template-columns: 1fr; } .event-form-options .event-options-grid { display: grid; } .event-form-options > .event-checkbox, .event-form-options > .event-registration-advanced { grid-column: auto; } .event-form-actions { grid-template-columns: 1fr 1fr; } }
