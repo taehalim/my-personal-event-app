@@ -47,9 +47,9 @@ button, input, textarea, select { font: inherit; }
 .event-directory-card.is-live { background: #fffafa; box-shadow: inset 3px 0 0 #d92d20; }
 .event-directory-card.is-live:hover { background: #fff4f2; }
 .event-directory-card.is-live .event-directory-time { color: #b42318; }
-.event-directory-card.is-past { opacity: .68; }
-.event-directory-card.is-past:hover { opacity: .84; background: #f7f7f7; }
-.event-directory-card.is-past .event-directory-card-image { filter: grayscale(.7); }
+.event-directory-card.is-past { opacity: .5; }
+.event-directory-card.is-past:hover { opacity: .68; background: #f7f7f7; }
+.event-directory-card.is-past .event-directory-card-image { filter: grayscale(.95); }
 .event-directory-card.is-cancelled { opacity: .56; }
 .event-directory-card.is-cancelled .event-directory-card-image { filter: grayscale(.85); }
 .event-directory-card-body { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 20px; height: 128px; }
