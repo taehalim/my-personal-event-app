@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Check, Copy, MapPin, UsersRound } from 'lucide-react';
 import { publicCoverUrl } from '@/lib/formatting';
-import { formatEventLocation, formatEventStartTime } from '@/lib/event-directory';
+import { formatEventLocation, formatEventStartTime, getEventDirectoryState } from '@/lib/event-directory';
 import type { LamaEvent } from '@/lib/types';
 
 type AdminActions = {
@@ -17,28 +17,29 @@ type AdminActions = {
 type EventDirectoryCardProps = {
   event: LamaEvent;
   href: string;
+  referenceNow: string;
   participantLabel: string;
-  statusLabel?: string;
   adminActions?: AdminActions;
 };
 
 export default function EventDirectoryCard({
   event,
   href,
+  referenceNow,
   participantLabel,
-  statusLabel,
   adminActions,
 }: EventDirectoryCardProps) {
   const cover = publicCoverUrl(event.cover_image_path);
+  const state = getEventDirectoryState(event, referenceNow);
+  const liveLabel = state === 'live' ? ' · 진행 중' : '';
 
-  return <article className="event-directory-card">
-    <Link className="event-directory-card-body" href={href} aria-label={`${event.title} 공개 페이지 보기`}>
+  return <article className={`event-directory-card is-${state}`}>
+    <Link className="event-directory-card-body" href={href} aria-label={`${event.title} 공개 페이지 보기${liveLabel}`}>
       <div className="event-directory-card-content">
         <time className="event-directory-time" dateTime={event.start_at}>{formatEventStartTime(event)}</time>
         <h2>{event.title}</h2>
-        <p className="event-directory-meta"><MapPin size={18} strokeWidth={1.8} />{formatEventLocation(event)}</p>
-        <p className="event-directory-meta"><UsersRound size={18} strokeWidth={1.8} />{participantLabel}</p>
-        {statusLabel && <span className={`event-directory-status${event.status === 'cancelled' ? ' cancelled' : ''}`}>{statusLabel}</span>}
+        <p className="event-directory-meta"><MapPin size={18} strokeWidth={1.8} /><span>{formatEventLocation(event)}</span></p>
+        <p className="event-directory-meta"><UsersRound size={18} strokeWidth={1.8} /><span>{participantLabel}</span></p>
       </div>
       <div className="event-directory-card-image">
         {cover ? <Image src={cover} alt="" fill sizes="128px" /> : <span aria-hidden="true">I</span>}

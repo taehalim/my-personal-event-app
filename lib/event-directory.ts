@@ -1,5 +1,7 @@
 import type { LamaEvent } from '@/lib/types';
 
+export type EventDirectoryState = 'upcoming' | 'live' | 'past' | 'cancelled';
+
 export type LocalEventDate = {
   month: string;
   day: string;
@@ -53,4 +55,16 @@ export function formatEventStartTime(event: LamaEvent) {
 
 export function formatEventLocation(event: LamaEvent) {
   return event.location_type === 'online' ? '온라인' : event.location_name ?? '장소 미정';
+}
+
+export function getEventDirectoryState(event: LamaEvent, referenceNow: string): EventDirectoryState {
+  if (event.status === 'cancelled') return 'cancelled';
+
+  const now = new Date(referenceNow).getTime();
+  const start = new Date(event.start_at).getTime();
+  const end = new Date(event.end_at).getTime();
+
+  if (start <= now && end >= now) return 'live';
+  if (end < now) return 'past';
+  return 'upcoming';
 }
