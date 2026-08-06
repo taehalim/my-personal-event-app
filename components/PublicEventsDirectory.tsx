@@ -7,16 +7,30 @@ import { publicCoverUrl } from '@/lib/formatting';
 import type { LamaEvent } from '@/lib/types';
 
 type Tab = 'upcoming' | 'past';
+type LocalDate = { month: string; day: string; weekday: string; key: string };
+type EventDay = { date: LocalDate; events: LamaEvent[] };
 
-function localDateParts(event: LamaEvent) {
+function localDateParts(event: LamaEvent): LocalDate {
   const parts = new Intl.DateTimeFormat('ko-KR', {
     timeZone: event.timezone,
     year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
     weekday: 'long',
   }).formatToParts(new Date(event.start_at));
-  return Object.fromEntries(parts.map(part => [part.type, part.value]));
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return { month: `${Number(values.month)}월`, day: String(Number(values.day)), weekday: values.weekday, key: `${values.year}-${values.month}-${values.day}` };
+}
+
+function groupEventsByDate(events: LamaEvent[]): EventDay[] {
+  const groups = new Map<string, EventDay>();
+  for (const event of events) {
+    const date = localDateParts(event);
+    const group = groups.get(date.key);
+    if (group) group.events.push(event);
+    else groups.set(date.key, { date, events: [event] });
+  }
+  return [...groups.values()];
 }
 
 function formatTime(event: LamaEvent) {
@@ -29,7 +43,11 @@ function formatLocation(event: LamaEvent) {
 
 export default function PublicEventsDirectory({ events, referenceNow }: { events: LamaEvent[]; referenceNow: string }) {
   const [tab, setTab] = useState<Tab>('upcoming');
-  const visibleEvents = useMemo(() => { const now = new Date(referenceNow); return events.filter(event => tab === 'upcoming' ? new Date(event.end_at) >= now : new Date(event.end_at) < now); }, [events, referenceNow, tab]);
+  const visibleEvents = useMemo(() => {
+    const now = new Date(referenceNow);
+    return events.filter(event => tab === 'upcoming' ? new Date(event.end_at) >= now : new Date(event.end_at) < now);
+  }, [events, referenceNow, tab]);
+  const eventDays = useMemo(() => groupEventsByDate(visibleEvents), [visibleEvents]);
 
   return <main className="events-directory">
     <header className="events-directory-header">
@@ -39,6 +57,6 @@ export default function PublicEventsDirectory({ events, referenceNow }: { events
         <button type="button" role="tab" aria-selected={tab === 'past'} className={tab === 'past' ? 'active' : ''} onClick={() => setTab('past')}>지난 이벤트</button>
       </div>
     </header>
-    {visibleEvents.length === 0 ? <section className="events-empty"><h2>{tab === 'upcoming' ? '예정된 이벤트가 없습니다' : '지난 이벤트가 없습니다'}</h2><p>{tab === 'upcoming' ? '새 이벤트가 공개되면 이곳에 표시됩니다.' : '지난 이벤트가 이곳에 모입니다.'}</p></section> : <div className="events-timeline">{visibleEvents.map(event => { const date = localDateParts(event); const cover = publicCoverUrl(event.cover_image_path); return <div className="event-row" key={event.id}><div className="event-date"><strong>{date.month} {date.day}일</strong><span>{date.weekday}</span></div><div className="event-dot" aria-hidden="true"/><Link className="event-card" href={`/${event.slug}`}><div className="event-card-content"><span className="event-time">{formatTime(event)}</span><h2>{event.title}</h2><p className="event-host">{event.host_name} 주최</p><p className="event-location">{formatLocation(event)}</p><span className={`event-status ${event.status === 'cancelled' ? 'cancelled' : ''}`}>{event.status === 'cancelled' ? '취소' : tab === 'upcoming' ? '예정' : '종료'}</span></div><div className="event-card-image">{cover ? <Image src={cover} alt="" fill sizes="180px" /> : <span aria-hidden="true">I</span>}</div></Link></div>; })}</div>}
+    {eventDays.length === 0 ? <section className="events-empty"><h2>{tab === 'upcoming' ? '예정된 이벤트가 없습니다' : '지난 이벤트가 없습니다'}</h2><p>{tab === 'upcoming' ? '새 이벤트가 공개되면 이곳에 표시됩니다.' : '지난 이벤트가 이곳에 모입니다.'}</p></section> : <div className="events-day-list">{eventDays.map(day => <section className="events-day-group" key={day.date.key}><header className="events-day-heading"><strong>{day.date.month} {day.date.day}일</strong><span>{day.date.weekday}</span></header><div className="events-day-items">{day.events.map(event => { const cover = publicCoverUrl(event.cover_image_path); return <Link className="event-card" href={`/${event.slug}`} key={event.id}><div className="event-card-content"><span className="event-time">{formatTime(event)}</span><h2>{event.title}</h2><p className="event-host">{event.host_name} 주최</p><p className="event-location">{formatLocation(event)}</p><span className={`event-status ${event.status === 'cancelled' ? 'cancelled' : ''}`}>{event.status === 'cancelled' ? '취소' : tab === 'upcoming' ? '예정' : '종료'}</span></div><div className="event-card-image">{cover ? <Image src={cover} alt="" fill sizes="116px" /> : <span aria-hidden="true">I</span>}</div></Link>; })}</div></section>)}</div>}
   </main>;
 }

@@ -42,8 +42,8 @@ button, input, textarea, select { font: inherit; }
 .admin-events-header { position: relative; }
 .admin-create-button { position: absolute; top: 2px; right: 0; align-self: center; padding: 4px 0; color: var(--foreground); font-size: 15px; font-weight: 600; }
 .admin-create-button:hover { text-decoration: underline; }
-.admin-event-showcase-card { display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 18px; min-height: 174px; padding: 18px 20px; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 12px; background: var(--card); box-shadow: none; transition: border-color .2s ease, background .2s ease; }
-.admin-event-showcase-card:hover { border-color: #cdd5ee; background: #fefeff; }
+.admin-event-showcase-card { display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 18px; min-height: 174px; padding: 16px 8px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; transition: background .2s ease; }
+.admin-event-showcase-card:hover { background: #f7f7f7; }
 .admin-event-showcase-content { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
 .admin-event-time { color: var(--accent); font-size: 15px; font-weight: 650; letter-spacing: -.025em; }
 .admin-event-showcase-card h2 { display: block; overflow: hidden; margin: 9px 0 13px; font-size: clamp(20px, 2.5vw, 25px); line-height: 1.15; letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
@@ -53,24 +53,21 @@ button, input, textarea, select { font: inherit; }
 .admin-manage-button { min-height: 36px; padding: 0 13px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 12px; }
 .admin-manage-button:hover { background: var(--accent-hover); }
 .admin-participants-button { min-height: 36px; padding: 0 13px; border-radius: 8px; background: var(--accent-soft); color: var(--accent-hover); font-size: 12px; }
-.admin-participants-button:hover { background: #e3e9ff; }
+.admin-participants-button:hover { background: #e8e8e8; }
 .admin-event-showcase-image { position: relative; min-height: 116px; overflow: hidden; border-radius: 10px; background: var(--surface-subtle); }
 .admin-event-showcase-image img { object-fit: cover; }
 .admin-event-showcase-image span { display: grid; height: 100%; place-items: center; color: #777; font-size: 40px; }
 .event-tabs { display: flex; align-items: center; gap: 28px; }
 .event-tabs button { border: 0; padding: 0; background: transparent; color: #b5b5b5; font-size: 17px; font-weight: 500; cursor: pointer; }
 .event-tabs button.active { color: var(--foreground); }
-.events-timeline { display: grid; gap: 16px; }
-.event-row { display: grid; grid-template-columns: 86px 10px minmax(0, 1fr); gap: 14px; align-items: start; }
-.event-date { display: grid; align-content: start; gap: 5px; padding-top: 18px; }
-.event-date strong { font-size: 18px; letter-spacing: -.04em; }
-.event-date span { color: #989898; font-size: 13px; }
-.event-dot { position: relative; display: flex; justify-content: center; min-height: 100%; }
-.event-dot::before { content: ''; z-index: 1; width: 10px; height: 10px; margin-top: 18px; border-radius: 50%; background: #cfcfcf; }
-.event-dot::after { content: ''; position: absolute; top: 27px; bottom: -16px; border-left: 1px solid #e1e1e1; }
-.event-row:last-child .event-dot::after { display: none; }
-.event-card { display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 18px; min-height: 174px; padding: 18px 20px; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 12px; background: var(--card); box-shadow: none; transition: border-color .2s ease, background .2s ease; }
-.event-card:hover { border-color: #cdd5ee; background: #fefeff; }
+.events-day-list { display: grid; gap: 34px; }
+.events-day-group { display: grid; gap: 10px; }
+.events-day-heading { display: flex; align-items: baseline; gap: 9px; padding-left: 2px; }
+.events-day-heading strong { font-size: 18px; letter-spacing: -.04em; }
+.events-day-heading span { color: #989898; font-size: 13px; }
+.events-day-items { display: grid; gap: 2px; }
+.event-card { display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 18px; min-height: 174px; padding: 16px 8px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; transition: background .2s ease; }
+.event-card:hover { background: #f7f7f7; }
 .event-card-content { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
 .event-time { color: var(--accent); font-size: 14px; font-weight: 650; }
 .event-card h2 { margin: 8px 0 7px; font-size: clamp(18px, 2.2vw, 23px); line-height: 1.12; letter-spacing: -.045em; }
