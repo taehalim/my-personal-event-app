@@ -285,9 +285,62 @@ button, input, textarea, select { font: inherit; }
 .auth-card { display: grid; gap: 16px; padding: 32px; margin-top: 22px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--card); box-shadow: var(--shadow-card); }
 .auth-card h1 { margin: 4px 0 0; font-size: 28px; letter-spacing: -.04em; }
 .auth-card p { margin: 0 0 6px; }
+.public-event-page { min-height: 100vh; background: #fff; }
+.public-event-container { width: min(1180px, calc(100% - 48px)); padding: 40px 0 96px; margin: 0 auto; }
+.public-event-back { display: inline-flex; align-items: center; gap: 6px; color: #777; font-size: 14px; }
+.public-event-back:hover { color: var(--foreground); }
+.public-event-layout { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); align-items: start; gap: 64px; margin-top: 40px; }
+.public-event-sidebar { position: sticky; top: 28px; min-width: 0; }
+.public-event-cover { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 16px; background: #f1f1f1; }
+.public-event-cover img { object-fit: cover; }
+.public-event-cover > span { display: grid; height: 100%; place-items: center; color: #888; font-size: 72px; }
+.public-event-sidebar-info { display: grid; gap: 22px; padding: 20px 6px 0; }
+.public-event-host, .public-event-attendance { display: grid; gap: 5px; }
+.public-event-host span { color: #999; font-size: 12px; }
+.public-event-host strong { font-size: 18px; letter-spacing: -.03em; }
+.public-event-attendance { display: flex; align-items: center; gap: 8px; color: #555; }
+.public-event-attendance strong { font-size: 15px; }
+.public-event-content { min-width: 0; max-width: 740px; }
+.public-event-hero { padding-bottom: 28px; }
+.public-event-hero h1 { max-width: 760px; margin: 0; font-size: clamp(36px, 4.5vw, 58px); font-weight: 550; line-height: 1.06; letter-spacing: -.065em; overflow-wrap: anywhere; }
+.public-event-facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 12px; padding: 20px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.public-event-fact { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.public-event-fact-icon { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: #f5f5f5; color: #555; }
+.public-event-fact > div { display: grid; gap: 5px; min-width: 0; padding-top: 1px; }
+.public-event-fact strong { overflow: hidden; font-size: 15px; font-weight: 650; letter-spacing: -.025em; text-overflow: ellipsis; white-space: nowrap; }
+.public-event-fact span, .public-event-fact a { display: inline-flex; align-items: center; gap: 5px; color: #777; font-size: 13px; line-height: 1.35; }
+.public-event-fact a:hover { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
+.public-event-rsvp { padding: 22px; margin: 28px 0 42px; border: 1px solid var(--border); border-radius: 16px; background: #fff; box-shadow: 0 4px 18px rgba(0, 0, 0, .035); }
+.public-event-rsvp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 18px; }
+.public-event-section-label { display: block; margin-bottom: 6px; color: #777; font-size: 13px; font-weight: 650; }
+.public-event-rsvp h2 { margin: 0; font-size: 21px; letter-spacing: -.04em; }
+.public-event-rsvp-state { padding-top: 3px; color: #888; font-size: 13px; white-space: nowrap; }
+.public-event-rsvp-state.is-open { color: #171717; font-weight: 650; }
+.public-event-rsvp-state.is-cancelled { color: var(--danger); }
+.public-event-rsvp-message { padding: 16px; margin: 0; border-radius: 10px; background: #f6f6f6; color: #777; font-size: 14px; }
+.registration-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.registration-form > .field:nth-child(n + 3), .registration-form > label, .registration-form > p, .registration-form > button { grid-column: 1 / -1; }
+.registration-form .field { gap: 6px; }
+.registration-form .field label { font-size: 13px; }
+.registration-form input, .registration-form textarea, .registration-form select { min-height: 46px; border-color: #e3e3e3; border-radius: 10px; padding: 11px 12px; }
+.registration-form textarea { min-height: 110px; }
+.registration-form > label { display: flex; align-items: flex-start; gap: 8px; color: #666; font-size: 13px !important; line-height: 1.5; }
+.registration-form input[type='checkbox'] { width: 16px; min-height: 16px; flex: 0 0 auto; margin-top: 2px; accent-color: #171717; }
+.registration-form > button { width: 100%; min-height: 48px; margin-top: 2px; }
+.registration-form-message { margin: 0; color: #31734a; font-size: 13px; }
+.public-event-about { padding-bottom: 20px; }
+.public-event-about h2 { padding-bottom: 12px; margin: 0 0 18px; border-bottom: 1px solid var(--border); font-size: 18px; letter-spacing: -.035em; }
+.public-event-description { color: #444; font-size: 15px; line-height: 1.8; }
+.public-event-description > :first-child { margin-top: 0; }
+.public-event-description > :last-child { margin-bottom: 0; }
+.public-event-description p { margin: 0 0 16px; }
+.public-event-description h3, .public-event-description h4 { color: var(--foreground); font-size: 17px; }
+.public-event-description ul, .public-event-description ol { padding-left: 20px; }
 @media (max-width: 768px) { .container { width: min(100% - 40px, 600px); } }
 @media (max-width: 720px) { .events-directory { width: min(100% - 24px, 560px); padding-top: 36px; } .events-directory-header { margin-bottom: 34px; } .events-directory-header h1 { font-size: 34px; } .event-tabs { gap: 22px; } .event-tabs button { font-size: 16px; } .admin-create-button { position: static; order: 3; align-self: stretch; margin-top: 4px; padding: 8px 0; text-align: center; } .admin-events-header .event-tabs { order: 2; } .event-directory-card { padding: 18px; border-radius: 14px; } .event-directory-card-body { grid-template-columns: minmax(0, 1fr) 120px; gap: 14px; height: 120px; } .event-directory-time { font-size: 15px; } .event-directory-card h2 { margin: 9px 0 12px; font-size: 20px; } .event-directory-meta { gap: 7px; font-size: 14px; } .event-directory-card-image { min-height: 120px; border-radius: 11px; } .event-directory-card-actions { gap: 7px; padding-top: 12px; } .admin-manage-button, .admin-participants-button { min-height: 36px; padding: 0 12px; font-size: 12px; } }
 @media (max-width: 720px) { .admin-shell { width: min(100% - 24px, 560px); padding-top: 36px; } .admin-header, .admin-detail-header { align-items: flex-start; flex-direction: column; } .admin-header h1 { font-size: 34px; } .admin-header > .button { align-self: stretch; } .admin-form-grid { grid-template-columns: 1fr; } .admin-filter-card { flex-wrap: wrap; } .admin-filter-card input { flex-basis: 100%; } .admin-filter-card select, .admin-filter-card button { flex: 1; } .admin-event-card { align-items: flex-start; } .admin-event-count { margin-left: auto; } .auth-shell { width: min(100% - 28px, 420px); padding-top: 44px; } .auth-card { padding: 24px; } }
 @media (max-width: 720px) { .events-directory-header { margin-bottom: 28px; } }
 @media (max-width: 720px) { .event-create-shell { width: min(100% - 28px, 560px); padding-top: 36px; } .event-create-kicker { margin-top: 20px; } .event-form-section { padding: 24px 0; } .event-form-section-heading { gap: 10px; margin-bottom: 18px; } .event-form-fields { grid-template-columns: 1fr; gap: 14px; } .event-form-field-wide, .event-cover-field { grid-column: auto; } .event-cover-row { align-items: flex-start; } .event-form-actions { justify-content: stretch; } .event-form-actions .button { flex: 1; min-width: 0; } }
 @media (max-width: 720px) { .event-create-shell { width: min(100% - 28px, 560px); } .event-form-workspace { grid-template-columns: 1fr; gap: 24px; } .event-form-media-panel { max-width: 280px; margin: 0 auto; } .event-cover-preview-large { width: min(280px, 100%); height: min(280px, 72vw); } .event-form-date-grid, .event-options-grid { grid-template-columns: 1fr; } .event-form-options { grid-template-columns: 1fr; } .event-form-options .event-options-grid { display: grid; } .event-form-options > .event-checkbox, .event-form-options > .event-registration-advanced { grid-column: auto; } .event-form-actions { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 820px) { .public-event-container { width: min(100% - 32px, 620px); padding-top: 32px; } .public-event-layout { grid-template-columns: 1fr; gap: 32px; margin-top: 28px; } .public-event-sidebar { position: static; } .public-event-cover { width: min(100%, 360px); } .public-event-sidebar-info { grid-template-columns: 1fr 1fr; padding-top: 16px; } .public-event-content { max-width: none; } }
+@media (max-width: 560px) { .public-event-container { width: min(100% - 28px, 520px); padding: 28px 0 64px; } .public-event-layout { gap: 26px; } .public-event-cover { width: 100%; border-radius: 14px; } .public-event-sidebar-info { grid-template-columns: 1fr; gap: 14px; } .public-event-hero { padding-bottom: 22px; } .public-event-hero h1 { font-size: 38px; } .public-event-facts { grid-template-columns: 1fr; gap: 18px; padding: 18px 0; } .public-event-rsvp { padding: 18px; margin: 22px 0 34px; } .public-event-rsvp-header { display: grid; gap: 4px; } .public-event-rsvp-state { padding-top: 0; } .registration-form { grid-template-columns: 1fr; gap: 13px; } .registration-form > .field:nth-child(n + 3), .registration-form > label, .registration-form > p, .registration-form > button { grid-column: auto; } }
