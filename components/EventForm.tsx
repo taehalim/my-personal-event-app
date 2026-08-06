@@ -26,6 +26,14 @@ function toLocalInputValue(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
+function googleMapsSearchUrl(location: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+}
+
+function googleMapsEmbedUrl(location: string) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed`;
+}
+
 function DateTimePicker({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
   const selected = parseDateValue(value);
   const [open, setOpen] = useState(false);
@@ -57,6 +65,7 @@ function LocationPicker({ locationType, locationName, locationUrl, onTypeChange,
     <button type="button" className={`event-location-trigger ${selected ? 'has-location' : ''}`} onClick={() => setOpen(current => !current)} aria-expanded={open}>
       {locationType === 'online' ? <Video size={20} strokeWidth={1.8} aria-hidden="true" /> : <MapPin size={20} strokeWidth={1.8} aria-hidden="true" />}<span><strong>{selected || '장소 추가'}</strong><small>{selected ? (locationType === 'online' ? '온라인 링크' : '오프라인 장소') : '오프라인 장소 또는 온라인 링크'}</small></span><ChevronRight className="event-location-chevron" size={18} aria-hidden="true" />
     </button>
+    {locationType === 'in_person' && locationName.trim() && <div className="event-location-map-preview"><iframe title="이벤트 장소 지도" src={googleMapsEmbedUrl(locationName)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><a href={googleMapsSearchUrl(locationName)} target="_blank" rel="noreferrer"><MapPin size={14} />Google Maps에서 보기</a></div>}
     {open && <div className="event-location-popover" role="dialog" aria-label="장소 추가">
       <div className="event-location-popover-header"><strong>어디서 만날까요?</strong><button type="button" aria-label="장소 선택 닫기" onClick={() => setOpen(false)}><X size={18} /></button></div>
       <div className="event-location-type-switch" role="tablist" aria-label="장소 유형"><button type="button" className={locationType === 'in_person' ? 'active' : ''} onClick={() => onTypeChange('in_person')}><MapPin size={16} />오프라인</button><button type="button" className={locationType === 'online' ? 'active' : ''} onClick={() => onTypeChange('online')}><Video size={16} />온라인</button></div>
@@ -122,7 +131,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         locationType,
         locationName: locationType === 'in_person' ? locationName : null,
         locationUrl: locationType === 'online' ? locationUrl : null,
-        mapUrl: null,
+        mapUrl: locationType === 'in_person' && locationName.trim() ? googleMapsSearchUrl(locationName) : null,
         registrationEnabled,
         registrationOpenAt: registrationOpenAt ? new Date(registrationOpenAt).toISOString() : null,
         registrationCloseAt: registrationCloseAt ? new Date(registrationCloseAt).toISOString() : null,
@@ -165,8 +174,8 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
       </aside>
 
       <div className="event-form-main-panel">
-        <div className="event-form-status-row">{event ? <label className="event-status-select"><Globe2 size={16} strokeWidth={1.8} aria-hidden="true" /><span>상태</span><select aria-label="공개 상태" value={status} onChange={inputEvent => setStatus(inputEvent.target.value as 'draft' | 'published' | 'cancelled')}><option value="published">공개</option><option value="draft">비공개 초안</option><option value="cancelled">취소</option></select></label> : <span className="event-form-public-label"><Globe2 size={16} strokeWidth={1.8} aria-hidden="true" />공개로 생성</span>}</div>
-        <div className="field event-title-field"><label htmlFor="event-title">이벤트 제목 *</label><input id="event-title" required maxLength={120} value={title} onChange={inputEvent => setTitle(inputEvent.target.value)} placeholder="예: 바이브코딩 클럽" /></div>
+        {event && <div className="event-form-status-row"><label className="event-status-select"><Globe2 size={16} strokeWidth={1.8} aria-hidden="true" /><span>상태</span><select aria-label="공개 상태" value={status} onChange={inputEvent => setStatus(inputEvent.target.value as 'draft' | 'published' | 'cancelled')}><option value="published">공개</option><option value="draft">비공개 초안</option><option value="cancelled">취소</option></select></label></div>}
+        <div className="field event-title-field"><label htmlFor="event-title">이벤트 제목 *</label><input id="event-title" required maxLength={120} value={title} onChange={inputEvent => setTitle(inputEvent.target.value)} placeholder="이벤트 제목" /></div>
         <div className="event-form-compact-block event-form-schedule-block"><div className="event-form-compact-heading"><strong>일정</strong><span><Globe2 size={14} aria-hidden="true" />Asia/Seoul</span></div><div className="event-form-date-list"><DateTimePicker id="event-start" label="시작" value={startAt} onChange={setStartAt} /><DateTimePicker id="event-end" label="종료" value={endAt} onChange={setEndAt} /></div></div>
 
         <LocationPicker locationType={locationType} locationName={locationName} locationUrl={locationUrl} onTypeChange={setLocationType} onLocationNameChange={setLocationName} onLocationUrlChange={setLocationUrl} />
