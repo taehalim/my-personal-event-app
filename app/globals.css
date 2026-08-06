@@ -42,15 +42,15 @@ button, input, textarea, select { font: inherit; }
 .admin-events-header { position: relative; }
 .admin-create-button { position: absolute; top: 2px; right: 0; align-self: center; padding: 4px 0; color: var(--foreground); font-size: 15px; font-weight: 600; }
 .admin-create-button:hover { text-decoration: underline; }
-.admin-event-showcase-card { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 20px; min-height: 200px; padding: 24px 10px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; cursor: pointer; transition: background .2s ease; }
+.admin-event-showcase-card { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 20px; min-height: 200px; padding: 26px 24px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; cursor: pointer; transition: background .2s ease; }
 .admin-event-showcase-card:hover { background: #f7f7f7; }
 .admin-event-showcase-card:focus-visible { outline: 2px solid #171717; outline-offset: 3px; }
 .admin-event-showcase-content { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
 .admin-event-time { color: var(--accent); font-size: 15px; font-weight: 650; letter-spacing: -.025em; }
-.admin-event-showcase-card h2 { display: block; overflow: hidden; margin: 9px 0 13px; font-size: clamp(20px, 2.5vw, 25px); line-height: 1.15; letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
-.admin-event-meta { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: #8a8a8a; font-size: 14px; }
+.admin-event-showcase-card h2 { display: block; overflow: hidden; margin: 8px 0 11px; font-size: clamp(20px, 2.5vw, 25px); line-height: 1.15; letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
+.admin-event-meta { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; color: #8a8a8a; font-size: 14px; }
 .admin-event-meta svg { flex: 0 0 auto; }
-.admin-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 14px; }
+.admin-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 12px; }
 .admin-manage-button { min-height: 36px; padding: 0 13px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 12px; }
 .admin-manage-button:hover { background: var(--accent-hover); }
 .admin-participants-button { min-height: 36px; padding: 0 13px; border-radius: 8px; background: var(--accent-soft); color: var(--accent-hover); font-size: 12px; }
@@ -70,7 +70,7 @@ button, input, textarea, select { font: inherit; }
 .events-day-heading strong { font-size: 18px; letter-spacing: -.04em; }
 .events-day-heading span { color: #989898; font-size: 13px; }
 .events-day-items { display: grid; gap: 2px; }
-.event-card { display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 18px; min-height: 174px; padding: 16px 8px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; transition: background .2s ease; }
+.event-card { display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 18px; min-height: 174px; padding: 26px 24px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; transition: background .2s ease; }
 .event-card:hover { background: #f7f7f7; }
 .event-card-content { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
 .event-time { color: var(--accent); font-size: 14px; font-weight: 650; }
