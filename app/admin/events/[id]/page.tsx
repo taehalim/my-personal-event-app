@@ -13,7 +13,7 @@ export default async function EventAdminPage({ params }: { params: Promise<{ id:
   if (!event) notFound();
   return <main className="admin-shell">
     <header className="admin-header admin-detail-header">
-      <div><Link href="/admin" className="muted">← 행사 관리</Link><h1>{event.title}</h1></div>
+      <div><Link href="/admin" className="muted">← 이벤트 관리</Link><h1>{event.title}</h1></div>
       <div className="admin-actions"><Link className="button secondary" href={`/admin/events/${id}/registrations`}>참가자 관리</Link><DeleteEventButton id={id} /></div>
     </header>
     <p className="admin-public-link"><a href={`/${event.slug}`} target="_blank" className="muted">공개 링크 보기 ↗</a></p>
