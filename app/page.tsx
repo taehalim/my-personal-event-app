@@ -19,10 +19,7 @@ export default async function HomePage() {
   const events = await getCurrentEvents();
 
   return <main className="container" style={{ padding: '56px 0 80px' }}>
-    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
-      <span className="muted" aria-label="Inha's events">Inha&apos;s events</span>
-      <Link className="muted" href="/login">관리자 로그인</Link>
-    </header>
+    <header><span className="muted" aria-label="Inha's events">Inha&apos;s events</span></header>
     <section style={{ padding: '72px 0 36px', maxWidth: 760 }}>
       <p className="pill">Events</p>
       <h1 style={{ fontSize: 'clamp(42px, 7vw, 76px)', lineHeight: 1.04, margin: '18px 0' }}>지금 함께할 수 있는 이벤트</h1>
