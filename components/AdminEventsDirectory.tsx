@@ -29,7 +29,7 @@ export default function AdminEventsDirectory({ events, referenceNow }: { events:
 
   return <main className="events-directory admin-events-directory">
     <header className="events-directory-header admin-events-header">
-      <h1>Inha&apos;s events</h1>
+      <h1>Inha의 이벤트</h1>
       <Link href="/admin/events/new" className="button admin-create-button">행사 만들기</Link>
       <div className="event-tabs" role="tablist" aria-label="행사 상태">
         <button type="button" role="tab" aria-selected={tab === 'upcoming'} className={tab === 'upcoming' ? 'active' : ''} onClick={() => setTab('upcoming')}>예정</button>
