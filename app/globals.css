@@ -306,6 +306,9 @@ button, input, textarea, select { font: inherit; }
 .public-event-facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 12px; padding: 20px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .public-event-fact { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
 .public-event-fact-icon { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: #f5f5f5; color: #555; }
+.public-event-calendar-tile { display: grid; width: 50px; height: 54px; flex: 0 0 auto; place-items: center; align-content: center; border-radius: 12px; background: #f5f5f5; color: #555; }
+.public-event-calendar-tile span { color: #888; font-size: 10px; font-weight: 750; line-height: 1; }
+.public-event-calendar-tile strong { color: var(--foreground); font-size: 21px; font-weight: 700; line-height: 1.2; }
 .public-event-fact > div { display: grid; gap: 5px; min-width: 0; padding-top: 1px; }
 .public-event-fact strong { overflow: hidden; font-size: 15px; font-weight: 650; letter-spacing: -.025em; text-overflow: ellipsis; white-space: nowrap; }
 .public-event-fact span, .public-event-fact a { display: inline-flex; align-items: center; gap: 5px; color: #777; font-size: 13px; line-height: 1.35; }
@@ -319,12 +322,16 @@ button, input, textarea, select { font: inherit; }
 .public-event-rsvp-state.is-cancelled { color: var(--danger); }
 .public-event-rsvp-message { padding: 16px; margin: 0; border-radius: 10px; background: #f6f6f6; color: #777; font-size: 14px; }
 .registration-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.registration-form-compact { display: grid; gap: 15px; }
+.registration-form-compact p { margin: 0; color: #777; font-size: 14px; line-height: 1.5; }
+.registration-form-compact .button { width: 100%; min-height: 48px; }
 .registration-form > .field:nth-child(n + 3), .registration-form > label, .registration-form > p, .registration-form > button { grid-column: 1 / -1; }
 .registration-form .field { gap: 6px; }
 .registration-form .field label { font-size: 13px; }
 .registration-form input, .registration-form textarea, .registration-form select { min-height: 46px; border-color: #e3e3e3; border-radius: 10px; padding: 11px 12px; }
 .registration-form textarea { min-height: 110px; }
-.registration-form > label { display: flex; align-items: flex-start; gap: 8px; color: #666; font-size: 13px !important; line-height: 1.5; }
+.registration-form > label, .registration-field-checkbox { display: flex; align-items: flex-start; gap: 8px; color: #666; font-size: 13px !important; line-height: 1.5; }
+.registration-consent { margin: 0; }
 .registration-form input[type='checkbox'] { width: 16px; min-height: 16px; flex: 0 0 auto; margin-top: 2px; accent-color: #171717; }
 .registration-form > button { width: 100%; min-height: 48px; margin-top: 2px; }
 .registration-form-message { margin: 0; color: #31734a; font-size: 13px; }
@@ -336,6 +343,16 @@ button, input, textarea, select { font: inherit; }
 .public-event-description p { margin: 0 0 16px; }
 .public-event-description h3, .public-event-description h4 { color: var(--foreground); font-size: 17px; }
 .public-event-description ul, .public-event-description ol { padding-left: 20px; }
+.public-event-description img { display: block; max-width: 100%; height: auto; margin: 22px 0; border-radius: 12px; }
+.public-event-location { padding: 8px 0 20px; }
+.public-event-location h2 { padding-bottom: 12px; margin: 0 0 18px; border-bottom: 1px solid var(--border); font-size: 18px; letter-spacing: -.035em; }
+.public-event-location-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: #555; }
+.public-event-location-heading strong { color: var(--foreground); font-size: 15px; }
+.public-event-location-heading span { color: #777; font-size: 14px; }
+.public-event-map { overflow: hidden; min-height: 220px; border-radius: 14px; background: #f5f5f5; }
+.public-event-map iframe { display: block; width: 100%; height: 260px; border: 0; }
+.public-event-map-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; color: #666; font-size: 13px; }
+.public-event-map-link:hover { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 768px) { .container { width: min(100% - 40px, 600px); } }
 @media (max-width: 720px) { .events-directory { width: min(100% - 24px, 560px); padding-top: 36px; } .events-directory-header { margin-bottom: 34px; } .events-directory-header h1 { font-size: 34px; } .event-tabs { gap: 22px; } .event-tabs button { font-size: 16px; } .admin-create-button { position: static; order: 3; align-self: stretch; margin-top: 4px; padding: 8px 0; text-align: center; } .admin-events-header .event-tabs { order: 2; } .event-directory-card { padding: 18px; border-radius: 14px; } .event-directory-card-body { grid-template-columns: minmax(0, 1fr) 120px; gap: 14px; height: 120px; } .event-directory-time { font-size: 15px; } .event-directory-card h2 { margin: 9px 0 12px; font-size: 20px; } .event-directory-meta { gap: 7px; font-size: 14px; } .event-directory-card-image { min-height: 120px; border-radius: 11px; } .event-directory-card-actions { gap: 7px; padding-top: 12px; } .admin-manage-button, .admin-participants-button { min-height: 36px; padding: 0 12px; font-size: 12px; } }
 @media (max-width: 720px) { .admin-shell { width: min(100% - 24px, 560px); padding-top: 36px; } .admin-header, .admin-detail-header { align-items: flex-start; flex-direction: column; } .admin-header h1 { font-size: 34px; } .admin-header > .button { align-self: stretch; } .admin-form-grid { grid-template-columns: 1fr; } .admin-filter-card { flex-wrap: wrap; } .admin-filter-card input { flex-basis: 100%; } .admin-filter-card select, .admin-filter-card button { flex: 1; } .admin-event-card { align-items: flex-start; } .admin-event-count { margin-left: auto; } .auth-shell { width: min(100% - 28px, 420px); padding-top: 44px; } .auth-card { padding: 24px; } }

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
-import { ArrowLeft, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
+import { ArrowLeft, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -64,6 +64,15 @@ function getLocationSummary(event: LamaEvent) {
   };
 }
 
+function getMapEmbedUrl(event: LamaEvent) {
+  if (event.location_type !== 'in_person' || !event.location_name) return null;
+  return `https://www.google.com/maps?q=${encodeURIComponent(event.location_name)}&output=embed`;
+}
+
+function cleanDescription(description: string) {
+  return description.replaceAll('User Uploaded Image', '').replaceAll('\u200b', '');
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const data = await getEvent(slug);
@@ -92,6 +101,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const date = formatDateParts(data.event);
   const location = getLocationSummary(data.event);
   const locationHref = data.event.location_type === 'online' ? data.event.location_url : data.event.map_url;
+  const mapEmbedUrl = getMapEmbedUrl(data.event);
 
   return <main className="public-event-page">
     <div className="public-event-container">
@@ -121,7 +131,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
           <section className="public-event-facts" aria-label="이벤트 일정과 장소">
             <div className="public-event-fact public-event-date-fact">
-              <span className="public-event-fact-icon"><CalendarDays size={21} strokeWidth={1.7} /></span>
+              <span className="public-event-calendar-tile"><span>{date.month}</span><strong>{date.day}</strong></span>
               <div><strong>{date.dateLabel}</strong><span><Clock3 size={15} strokeWidth={1.8} />{date.timeLabel}</span></div>
             </div>
             <div className="public-event-fact">
@@ -140,8 +150,19 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
           <section className="public-event-about">
             <h2>이벤트 소개</h2>
-            <div className="public-event-description"><ReactMarkdown rehypePlugins={[rehypeSanitize]}>{data.event.description}</ReactMarkdown></div>
+            <div className="public-event-description"><ReactMarkdown rehypePlugins={[rehypeSanitize]} components={{ img: ({ alt: _alt, ...props }) => {
+              // Markdown image URLs are user content, so keep the native image element and suppress broken alt copy.
+              // eslint-disable-next-line @next/next/no-img-element
+              return <img {...props} alt="" loading="lazy" />;
+            } }}>{cleanDescription(data.event.description)}</ReactMarkdown></div>
           </section>
+
+          {mapEmbedUrl && <section className="public-event-location">
+            <h2>위치</h2>
+            <div className="public-event-location-heading"><MapPin size={18} strokeWidth={1.8} /><strong>{location.title}</strong>{location.detail && <span>{location.detail}</span>}</div>
+            <div className="public-event-map"><iframe title="이벤트 장소 지도" src={mapEmbedUrl} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div>
+            {locationHref && <a className="public-event-map-link" href={locationHref} target="_blank" rel="noreferrer">Google Maps에서 보기 <ExternalLink size={13} strokeWidth={1.8} /></a>}
+          </section>}
         </article>
       </div>
     </div>
