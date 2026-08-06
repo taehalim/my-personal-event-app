@@ -79,8 +79,8 @@ button, input, textarea, select { font: inherit; }
 .event-card-image { position: relative; min-height: 116px; overflow: hidden; border-radius: 10px; background: var(--surface-subtle); }
 .event-card-image img { object-fit: cover; }
 .event-card-image span { display: grid; height: 100%; place-items: center; color: #777; font-size: 60px; }
-.events-empty { padding: 48px 24px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--card); text-align: center; }
-.events-empty h2 { margin: 0 0 7px; font-size: 21px; }
+.events-empty { padding: 18px 8px 8px; background: transparent; text-align: left; }
+.events-empty h2 { margin: 0 0 7px; font-size: 18px; letter-spacing: -.035em; }
 .events-empty p { margin: 0; color: #999; font-size: 14px; }
 .admin-shell { width: min(820px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 80px; }
 .admin-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 40px; }
