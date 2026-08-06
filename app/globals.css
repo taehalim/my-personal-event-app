@@ -42,8 +42,9 @@ button, input, textarea, select { font: inherit; }
 .admin-events-header { position: relative; }
 .admin-create-button { position: absolute; top: 2px; right: 0; align-self: center; padding: 4px 0; color: var(--foreground); font-size: 15px; font-weight: 600; }
 .admin-create-button:hover { text-decoration: underline; }
-.admin-event-showcase-card { display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 18px; min-height: 174px; padding: 16px 8px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; transition: background .2s ease; }
+.admin-event-showcase-card { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 20px; min-height: 200px; padding: 24px 10px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; cursor: pointer; transition: background .2s ease; }
 .admin-event-showcase-card:hover { background: #f7f7f7; }
+.admin-event-showcase-card:focus-visible { outline: 2px solid #171717; outline-offset: 3px; }
 .admin-event-showcase-content { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
 .admin-event-time { color: var(--accent); font-size: 15px; font-weight: 650; letter-spacing: -.025em; }
 .admin-event-showcase-card h2 { display: block; overflow: hidden; margin: 9px 0 13px; font-size: clamp(20px, 2.5vw, 25px); line-height: 1.15; letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
@@ -54,7 +55,10 @@ button, input, textarea, select { font: inherit; }
 .admin-manage-button:hover { background: var(--accent-hover); }
 .admin-participants-button { min-height: 36px; padding: 0 13px; border-radius: 8px; background: var(--accent-soft); color: var(--accent-hover); font-size: 12px; }
 .admin-participants-button:hover { background: #e8e8e8; }
-.admin-event-showcase-image { position: relative; min-height: 116px; overflow: hidden; border-radius: 10px; background: var(--surface-subtle); }
+.admin-copy-button { min-height: 36px; padding: 0 12px; border-radius: 8px; background: transparent; color: #666; font-size: 12px; }
+.admin-copy-button:hover { background: #f1f1f1; }
+.admin-copy-button span { display: inline-flex; align-items: center; }
+.admin-event-showcase-image { position: relative; min-height: 128px; overflow: hidden; border-radius: 10px; background: var(--surface-subtle); }
 .admin-event-showcase-image img { object-fit: cover; }
 .admin-event-showcase-image span { display: grid; height: 100%; place-items: center; color: #777; font-size: 40px; }
 .event-tabs { display: flex; align-items: center; gap: 28px; }
@@ -79,9 +83,11 @@ button, input, textarea, select { font: inherit; }
 .event-card-image { position: relative; min-height: 116px; overflow: hidden; border-radius: 10px; background: var(--surface-subtle); }
 .event-card-image img { object-fit: cover; }
 .event-card-image span { display: grid; height: 100%; place-items: center; color: #777; font-size: 60px; }
-.events-empty { padding: 18px 8px 8px; background: transparent; text-align: left; }
-.events-empty h2 { margin: 0 0 7px; font-size: 18px; letter-spacing: -.035em; }
-.events-empty p { margin: 0; color: #999; font-size: 14px; }
+.events-empty { display: grid; justify-items: center; gap: 9px; padding: 64px 16px 48px; background: transparent; text-align: center; }
+.events-empty-icon { display: grid; width: 44px; height: 44px; place-items: center; margin-bottom: 4px; border-radius: 12px; background: #f2f2f2; color: #666; }
+.events-empty h2 { max-width: 360px; margin: 0; font-size: 20px; line-height: 1.3; letter-spacing: -.04em; }
+.events-empty p { max-width: 320px; margin: 0; color: #999; font-size: 14px; line-height: 1.5; }
+.events-empty-action { display: inline-flex; align-items: center; gap: 7px; margin-top: 5px; padding-bottom: 3px; border-bottom: 1px solid currentColor; color: var(--foreground); font-size: 14px; font-weight: 700; }
 .admin-shell { width: min(820px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 80px; }
 .admin-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 40px; }
 .admin-header h1 { margin: 10px 0 0; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.05em; }
