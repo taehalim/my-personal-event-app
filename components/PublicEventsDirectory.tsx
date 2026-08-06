@@ -33,7 +33,7 @@ export default function PublicEventsDirectory({ events, referenceNow }: { events
 
   return <main className="events-directory">
     <header className="events-directory-header">
-      <h1>Events</h1>
+      <h1>Inha&apos;s events</h1>
       <div className="event-tabs" role="tablist" aria-label="Event status">
         <button type="button" role="tab" aria-selected={tab === 'upcoming'} className={tab === 'upcoming' ? 'active' : ''} onClick={() => setTab('upcoming')}>Upcoming</button>
         <button type="button" role="tab" aria-selected={tab === 'past'} className={tab === 'past' ? 'active' : ''} onClick={() => setTab('past')}>Past</button>
