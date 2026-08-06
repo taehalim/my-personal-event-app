@@ -166,8 +166,8 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   return <form onSubmit={save} className="admin-form event-form">
     <div className="event-form-workspace">
       <aside className="event-form-media-panel">
-        <div className="event-cover-preview event-cover-preview-large">{coverPath ? <Image src={publicCoverUrl(coverPath) ?? ''} alt="현재 대표 이미지" fill sizes="280px" /> : <span aria-hidden="true">대표 이미지</span>}</div>
-        <label htmlFor="event-cover" className="event-file-button event-file-button-wide"><ImagePlus size={16} strokeWidth={1.8} />이미지 선택</label>
+        <div className="event-cover-preview event-cover-preview-large">{coverPath ? <Image src={publicCoverUrl(coverPath) ?? ''} alt="현재 대표 이미지" fill sizes="240px" /> : <span aria-hidden="true"><ImagePlus size={22} strokeWidth={1.7} /><span>대표 이미지</span></span>}</div>
+        <label htmlFor="event-cover" className="event-file-button event-file-button-wide"><ImagePlus size={16} strokeWidth={1.8} />대표 이미지 추가</label>
         <input id="event-cover" className="event-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } setCoverFile(file); }} />
         <p className="field-hint">JPG, PNG, WEBP · 최대 10MB</p>
         {coverFile && <p className="field-hint">선택됨: {coverFile.name}</p>}
