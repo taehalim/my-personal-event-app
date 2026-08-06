@@ -11,7 +11,7 @@ create table public.events (
   timezone text not null default 'Asia/Seoul', location_type text not null,
   location_name text, location_url text, map_url text, registration_enabled boolean not null default true,
   registration_open_at timestamptz, registration_close_at timestamptz, capacity integer,
-  approval_mode text not null default 'auto', status text not null default 'draft',
+  approval_mode text not null default 'auto', status text not null default 'published',
   created_by uuid not null references auth.users(id), created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
   constraint events_location_type_check check (location_type in ('in_person','online')),
   constraint events_approval_mode_check check (approval_mode in ('auto','manual')),
