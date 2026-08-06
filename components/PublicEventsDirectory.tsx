@@ -33,6 +33,7 @@ export default function PublicEventsDirectory({ events, referenceNow }: { events
 
   return <main className="events-directory">
     <header className="events-directory-header">
+      <span className="events-directory-kicker">인하 캠퍼스</span>
       <h1>Inha의 이벤트</h1>
       <div className="event-tabs" role="tablist" aria-label="이벤트 상태">
         <button type="button" role="tab" aria-selected={tab === 'upcoming'} className={tab === 'upcoming' ? 'active' : ''} onClick={() => setTab('upcoming')}>예정</button>
