@@ -220,6 +220,65 @@ button, input, textarea, select { font: inherit; }
 .event-registration-advanced .event-options-grid { padding-top: 8px; }
 .event-form-actions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding-top: 2px; }
 .event-form-actions .button:last-child { width: 100%; }
+.event-form :is(input, textarea, select):focus { border-color: var(--border); outline: 0; box-shadow: none; }
+.event-form button:focus-visible { outline: 0; box-shadow: 0 0 0 2px #d9d9d9; }
+.event-form-status-row { min-height: 26px; }
+.event-form-public-label { display: inline-flex; align-items: center; gap: 6px; color: #777; font-size: 12px; }
+.event-status-select { color: #777; }
+.event-status-select select { border: 0; }
+.event-title-field input:focus { border-color: var(--border); }
+.event-form-compact-heading span { display: inline-flex; align-items: center; gap: 5px; }
+.event-form-date-row { min-width: 0; }
+.event-form-date-label { color: #777; font-size: 12px; font-weight: 650; }
+.event-date-value { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 7px; min-width: 0; padding: 8px 10px; border: 0; border-radius: 10px; background: #fff; color: var(--foreground); cursor: pointer; font-size: 13px; text-align: left; }
+.event-date-value > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event-date-value.is-open { background: #f1f1f1; }
+.event-date-time { display: inline-flex; align-items: center; gap: 4px; color: #555; font-variant-numeric: tabular-nums; }
+.event-date-popover { position: absolute; z-index: 20; top: calc(100% + 8px); right: 0; width: 306px; padding: 14px; border: 1px solid #e7e7e7; border-radius: 14px; background: #fff; box-shadow: 0 18px 40px rgba(0, 0, 0, .14); }
+.event-date-popover-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.event-date-popover-header strong { font-size: 16px; }
+.event-date-popover-header div { display: flex; gap: 2px; }
+.event-date-popover-header button, .event-location-popover-header button { display: grid; width: 28px; height: 28px; place-items: center; border: 0; border-radius: 7px; background: transparent; color: #777; cursor: pointer; }
+.event-date-popover-header button:hover, .event-location-popover-header button:hover { background: #f3f3f3; color: #171717; }
+.event-calendar-weekdays, .event-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+.event-calendar-weekdays { margin-bottom: 5px; color: #999; font-size: 11px; }
+.event-calendar-grid { gap: 3px; }
+.event-calendar-grid button { display: grid; width: 32px; height: 32px; place-items: center; margin: 0 auto; border: 0; border-radius: 9px; background: transparent; color: #222; cursor: pointer; font-size: 13px; }
+.event-calendar-grid button:hover { background: #f1f1f1; }
+.event-calendar-grid button.is-outside { color: #c5c5c5; }
+.event-calendar-grid button.is-selected { background: #171717; color: #fff; }
+.event-date-time-picker { display: flex; align-items: center; gap: 7px; padding-top: 12px; margin-top: 10px; border-top: 1px solid #ededed; color: #777; font-size: 12px; }
+.event-date-time-picker select { width: auto; margin-left: auto; padding: 7px 9px; border: 1px solid var(--border); border-radius: 8px; background: #f7f7f7; font-size: 13px; }
+.event-location-picker { position: relative; }
+.event-location-trigger { display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; align-items: center; gap: 10px; width: 100%; min-height: 68px; padding: 12px 14px; border: 0; border-radius: 12px; background: #f7f7f7; color: #777; cursor: pointer; text-align: left; }
+.event-location-trigger:hover, .event-location-trigger[aria-expanded='true'] { background: #f1f1f1; }
+.event-location-trigger > span { display: grid; gap: 3px; min-width: 0; }
+.event-location-trigger strong { overflow: hidden; color: #5f665f; font-size: 15px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
+.event-location-trigger small { color: #999; font-size: 12px; }
+.event-location-chevron { color: #aaa; }
+.event-location-trigger.has-location strong { color: var(--foreground); }
+.event-location-popover { position: absolute; z-index: 20; top: calc(100% + 8px); right: 0; left: 0; padding: 14px; border: 1px solid #e7e7e7; border-radius: 14px; background: #fff; box-shadow: 0 18px 40px rgba(0, 0, 0, .14); }
+.event-location-popover-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.event-location-popover-header strong { font-size: 16px; }
+.event-location-type-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 4px; margin-bottom: 12px; border-radius: 10px; background: #f3f3f3; }
+.event-location-type-switch button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; border: 0; border-radius: 7px; background: transparent; color: #888; cursor: pointer; font-size: 12px; }
+.event-location-type-switch button.active { background: #fff; color: #171717; box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
+.event-location-input { display: flex; align-items: center; gap: 8px; padding: 10px 11px; border: 1px solid var(--border); border-radius: 9px; color: #999; }
+.event-location-input input { min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; font-size: 13px; }
+.event-location-hint { margin: 9px 0 12px; color: #999; font-size: 11px; line-height: 1.4; }
+.event-location-done { display: inline-flex; align-items: center; justify-content: center; gap: 5px; width: 100%; min-height: 36px; border: 0; border-radius: 8px; background: #171717; color: #fff; cursor: pointer; font-size: 12px; font-weight: 700; }
+.event-description-trigger { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 64px; padding: 0 14px; border: 0; border-radius: 12px; background: #f7f7f7; color: #777; cursor: pointer; font-size: 15px; text-align: left; }
+.event-description-trigger span { flex: 1; }
+.event-description-trigger:hover { background: #f1f1f1; color: #555; }
+.event-form-options { display: grid; grid-template-columns: 1fr; gap: 0; padding: 0; background: transparent; }
+.event-form-options .event-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 8px 0 4px; }
+.event-form-options > .event-form-compact-heading { padding: 3px 0 8px; }
+.event-option-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 9px; min-height: 48px; padding: 8px 13px; border-bottom: 1px solid #e9e9e9; background: #f7f7f7; color: #777; }
+.event-option-row:first-of-type { border-radius: 12px 12px 0 0; }
+.event-option-row input, .event-option-row select { width: auto; min-width: 110px; padding: 4px 0; border: 0; background: transparent; color: #555; font-size: 13px; text-align: right; }
+.event-option-row label { font-size: 13px; }
+.event-form-options > .event-checkbox { display: flex; min-height: 48px; align-items: center; padding: 8px 13px; margin: 0; border-bottom: 1px solid #e9e9e9; background: #f7f7f7; color: #777; font-size: 13px; }
+.event-form-options > .event-registration-advanced { padding: 0 13px; border-radius: 0 0 12px 12px; background: #f7f7f7; }
 .auth-shell { width: min(440px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0 88px; }
 .auth-card { display: grid; gap: 16px; padding: 32px; margin-top: 22px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--card); box-shadow: var(--shadow-card); }
 .auth-card h1 { margin: 4px 0 0; font-size: 28px; letter-spacing: -.04em; }
