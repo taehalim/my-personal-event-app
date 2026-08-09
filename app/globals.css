@@ -155,12 +155,17 @@ button, input, textarea, select { font: inherit; }
 .event-form-error { margin: 20px 0 0; }
 .event-form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 26px; }
 .event-form-actions .button { min-width: 112px; }
-.event-create-shell { width: min(960px, calc(100% - 40px)); padding-top: 16px; }
-.event-create-shell .event-create-header { min-height: 20px; margin-bottom: 18px; }
+.event-create-shell { width: min(900px, calc(100% - 40px)); padding-top: 32px; }
+.event-editor-header { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 24px; margin-bottom: 26px; }
 .event-create-shell .event-create-back { display: inline-flex; align-items: center; color: #777; font-size: 13px; }
-.event-form-workspace { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: start; }
+.event-editor-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 5px; }
+.event-editor-link { padding: 6px 8px; border-radius: 7px; color: #777; font-size: 12px; }
+.event-editor-link:hover { background: #f3f3f3; color: #171717; }
+.event-editor-delete { min-height: 32px; padding: 0 9px; border-radius: 7px; background: transparent; color: #a34b43; font-size: 12px; }
+.event-editor-delete:hover { background: #fdf0ef; }
+.event-form-workspace { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; }
 .event-form-media-panel { padding-top: 2px; }
-.event-cover-preview-large { width: 240px; height: 240px; border-radius: 14px; background: #f5f5f5; }
+.event-cover-preview-large { width: 220px; height: 220px; border-radius: 14px; background: #f5f5f5; }
 .event-cover-preview-large > span { display: grid; justify-items: center; gap: 8px; color: #a1a1a1; font-size: 13px; }
 .event-file-button-wide { width: 100%; justify-content: center; margin-top: 12px; }
 .event-form-main-panel { display: grid; gap: 8px; min-width: 0; }
@@ -359,5 +364,6 @@ button, input, textarea, select { font: inherit; }
 @media (max-width: 720px) { .events-directory-header { margin-bottom: 28px; } }
 @media (max-width: 720px) { .event-create-shell { width: min(100% - 28px, 560px); padding-top: 36px; } .event-create-kicker { margin-top: 20px; } .event-form-section { padding: 24px 0; } .event-form-section-heading { gap: 10px; margin-bottom: 18px; } .event-form-fields { grid-template-columns: 1fr; gap: 14px; } .event-form-field-wide, .event-cover-field { grid-column: auto; } .event-cover-row { align-items: flex-start; } .event-form-actions { justify-content: stretch; } .event-form-actions .button { flex: 1; min-width: 0; } }
 @media (max-width: 720px) { .event-create-shell { width: min(100% - 28px, 560px); } .event-form-workspace { grid-template-columns: 1fr; gap: 24px; } .event-form-media-panel { max-width: 280px; margin: 0 auto; } .event-cover-preview-large { width: min(280px, 100%); height: min(280px, 72vw); } .event-form-date-grid, .event-options-grid { grid-template-columns: 1fr; } .event-form-options { grid-template-columns: 1fr; } .event-form-options .event-options-grid { display: grid; } .event-form-options > .event-checkbox, .event-form-options > .event-registration-advanced { grid-column: auto; } .event-form-actions { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .event-create-shell { width: min(100% - 28px, 560px); padding-top: 28px; } .event-editor-header { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 22px; } .event-editor-actions { justify-content: flex-start; margin-left: -8px; } }
 @media (max-width: 820px) { .public-event-container { width: min(100% - 32px, 620px); padding-top: 32px; } .public-event-layout { grid-template-columns: 1fr; gap: 32px; margin-top: 28px; } .public-event-sidebar { position: static; } .public-event-cover { width: min(100%, 360px); } .public-event-sidebar-info { grid-template-columns: 1fr 1fr; padding-top: 16px; } .public-event-content { max-width: none; } }
 @media (max-width: 560px) { .public-event-container { width: min(100% - 28px, 520px); padding: 28px 0 64px; } .public-event-layout { gap: 26px; } .public-event-cover { width: 100%; border-radius: 14px; } .public-event-sidebar-info { grid-template-columns: 1fr; gap: 14px; } .public-event-hero { padding-bottom: 22px; } .public-event-hero h1 { font-size: 38px; } .public-event-facts { grid-template-columns: 1fr; gap: 18px; padding: 18px 0; } .public-event-rsvp { padding: 18px; margin: 22px 0 34px; } .public-event-rsvp-header { display: grid; gap: 4px; } .public-event-rsvp-state { padding-top: 0; } .registration-form { grid-template-columns: 1fr; gap: 13px; } .registration-form > .field:nth-child(n + 3), .registration-form > label, .registration-form > p, .registration-form > button { grid-column: auto; } }
