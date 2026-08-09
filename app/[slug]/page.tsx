@@ -3,7 +3,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
-import { ArrowLeft, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
+import { ArrowLeft, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -25,12 +27,6 @@ async function getEvent(slug: string) {
 }
 
 function formatDateParts(event: LamaEvent) {
-  const dateParts = new Intl.DateTimeFormat('ko-KR', {
-    timeZone: event.timezone,
-    month: 'numeric',
-    day: 'numeric',
-  }).formatToParts(new Date(event.start_at));
-  const values = Object.fromEntries(dateParts.map(part => [part.type, part.value]));
   const dateLabel = new Intl.DateTimeFormat('ko-KR', {
     timeZone: event.timezone,
     year: 'numeric',
@@ -46,8 +42,6 @@ function formatDateParts(event: LamaEvent) {
   }).format(new Date(value));
 
   return {
-    month: `${values.month}월`,
-    day: values.day,
     dateLabel,
     timeLabel: `${formatTime(event.start_at)}–${formatTime(event.end_at)}`,
   };
@@ -131,7 +125,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
           <section className="public-event-facts" aria-label="이벤트 일정과 장소">
             <div className="public-event-fact public-event-date-fact">
-              <span className="public-event-calendar-tile"><span>{date.month}</span><strong>{date.day}</strong></span>
+              <span className="public-event-fact-icon"><CalendarDays size={21} strokeWidth={1.7} /></span>
               <div><strong>{date.dateLabel}</strong><span><Clock3 size={15} strokeWidth={1.8} />{date.timeLabel}</span></div>
             </div>
             <div className="public-event-fact">
@@ -150,7 +144,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
           <section className="public-event-about">
             <h2>이벤트 소개</h2>
-            <div className="public-event-description"><ReactMarkdown rehypePlugins={[rehypeSanitize]} components={{ img: ({ alt: _alt, ...props }) => {
+            <div className="public-event-description"><ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeSanitize]} components={{ img: ({ alt: _alt, ...props }) => {
               // Markdown image URLs are user content, so keep the native image element and suppress broken alt copy.
               // eslint-disable-next-line @next/next/no-img-element
               return <img {...props} alt="" loading="lazy" />;
