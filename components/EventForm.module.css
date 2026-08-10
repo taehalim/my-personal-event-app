@@ -1,8 +1,10 @@
-.editorCanvas { --canvas-fg: #171717; --canvas-muted: #737373; --canvas-line: rgba(23,23,23,.12); --canvas-panel: rgba(255,255,255,.76); --canvas-control: rgba(246,246,246,.9); --canvas-control-active: #fff; --canvas-placeholder: #a0a0a0; position: relative; isolation: isolate; overflow: hidden; min-height: 760px; padding: clamp(24px, 4vw, 48px); color: var(--canvas-fg); background: transparent; }
+.editorCanvas { --canvas-fg: #171717; --canvas-muted: #737373; --canvas-line: rgba(23,23,23,.12); --canvas-panel: rgba(255,255,255,.76); --canvas-control: rgba(246,246,246,.9); --canvas-control-active: #fff; --canvas-placeholder: #a0a0a0; position: relative; isolation: isolate; overflow: visible; min-height: 760px; padding: clamp(24px, 4vw, 48px); color: var(--canvas-fg); background: transparent; }
 .editorCanvas[data-tone='dark'] { --canvas-fg: #f7f7f8; --canvas-muted: rgba(255,255,255,.68); --canvas-line: rgba(255,255,255,.16); --canvas-panel: rgba(26,26,29,.76); --canvas-control: rgba(255,255,255,.10); --canvas-control-active: rgba(255,255,255,.19); --canvas-placeholder: rgba(255,255,255,.48); background: transparent; }
 .editorCanvas :global(.event-background-layer) { z-index: 0; }
-.editorCanvas :global(.event-background-layer canvas) { opacity: .38; }
-.editorCanvas[data-tone='dark']::after { position: absolute; z-index: 0; inset: 0; background: rgba(12, 13, 17, .62); content: ''; pointer-events: none; }
+.editorCanvas :global(.event-background-full-viewport) { position: fixed; inset: 0; }
+.editorCanvas :global(.event-background-layer canvas) { opacity: .42; }
+.editorCanvas[data-tone='dark'] :global(.event-background-layer canvas) { opacity: .52; }
+.editorCanvas[data-tone='dark']::after { position: fixed; z-index: 0; inset: 0; background: rgba(12, 13, 17, .52); content: ''; pointer-events: none; }
 .form { position: relative; z-index: 1; width: min(100%, 1120px); margin: 0 auto; }
 .workspace { display: grid; grid-template-columns: minmax(240px, 280px) minmax(0, 1fr); gap: clamp(32px, 5vw, 56px); align-items: start; }
 .sidebar { position: sticky; top: 28px; display: grid; gap: 22px; }

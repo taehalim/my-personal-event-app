@@ -33,11 +33,11 @@ export function getBackgroundOptions(preset: EventBackgroundPreset): ISourceOpti
     ...base,
     particles: {
       number: { value: 46, density: { enable: true, width: 900, height: 900 } },
-      color: { value: ['#171717', '#555555', '#999999'] },
-      opacity: { value: { min: 0.18, max: 0.5 } },
+      color: { value: ['#ffffff', '#a9c7ff', '#ffc0df'] },
+      opacity: { value: { min: 0.2, max: 0.64 } },
       size: { value: { min: 1, max: 3 } },
-      links: { enable: true, distance: 150, color: '#555555', opacity: 0.18, width: 1 },
-      move: { enable: true, speed: 0.35, outModes: { default: 'bounce' } },
+      links: { enable: true, distance: 150, color: '#aac5ff', opacity: 0.26, width: 1 },
+      move: { enable: true, speed: 0.48, outModes: { default: 'bounce' } },
     },
     interactivity: { events: { onHover: { enable: true, mode: 'grab' } }, modes: { grab: { distance: 160, links: { opacity: 0.45 } } } },
   };
@@ -46,10 +46,10 @@ export function getBackgroundOptions(preset: EventBackgroundPreset): ISourceOpti
     ...base,
     particles: {
       number: { value: 28 },
-      color: { value: ['#171717', '#888888'] },
-      opacity: { value: { min: 0.2, max: 0.65 } },
+      color: { value: ['#d9e6ff', '#ffc5e1', '#fff0b6'] },
+      opacity: { value: { min: 0.2, max: 0.72 } },
       size: { value: { min: 2, max: 5 } },
-      move: { enable: true, speed: 0.7, direction: 'none', random: true, outModes: { default: 'bounce' } },
+      move: { enable: true, speed: 0.82, direction: 'none', random: true, outModes: { default: 'bounce' } },
     },
   };
 
@@ -57,10 +57,10 @@ export function getBackgroundOptions(preset: EventBackgroundPreset): ISourceOpti
     ...base,
     particles: {
       number: { value: 24 },
-      color: { value: ['#171717', '#777777', '#bdbdbd'] },
-      opacity: { value: { min: 0.08, max: 0.26 } },
+      color: { value: ['#ffffff', '#bed4ff', '#ffd0e4'] },
+      opacity: { value: { min: 0.1, max: 0.38 } },
       size: { value: { min: 12, max: 72 } },
-      move: { enable: true, speed: 0.65, direction: 'top', random: true, straight: false, outModes: { default: 'out' } },
+      move: { enable: true, speed: 0.72, direction: 'top', random: true, straight: false, outModes: { default: 'out' } },
     },
   };
 
@@ -68,8 +68,8 @@ export function getBackgroundOptions(preset: EventBackgroundPreset): ISourceOpti
     ...base,
     particles: {
       number: { value: 95, density: { enable: true, width: 900, height: 900 } },
-      color: { value: ['#111111', '#666666', '#b0b0b0'] },
-      opacity: { value: { min: 0.12, max: 0.68 }, animation: { enable: true, speed: 0.8, minimumValue: 0.08, sync: false } },
+      color: { value: ['#ffffff', '#ffe6a2', '#b8d7ff', '#ffc5e2'] },
+      opacity: { value: { min: 0.12, max: 0.78 }, animation: { enable: true, speed: 1.25, minimumValue: 0.08, sync: false } },
       size: { value: { min: 1, max: 3 } },
       move: { enable: true, speed: 0.18, random: true, outModes: { default: 'bounce' } },
     },
@@ -79,8 +79,8 @@ export function getBackgroundOptions(preset: EventBackgroundPreset): ISourceOpti
     ...base,
     particles: {
       number: { value: 65, density: { enable: true, width: 900, height: 900 } },
-      color: { value: '#666666' },
-      opacity: { value: { min: 0.12, max: 0.36 } },
+      color: { value: ['#c8dcff', '#f5ddff', '#ffffff'] },
+      opacity: { value: { min: 0.14, max: 0.44 } },
       shape: { type: 'line' },
       size: { value: { min: 5, max: 15 } },
       move: { enable: true, speed: 2.2, direction: 'bottom', straight: true, outModes: { default: 'out' } },
@@ -91,11 +91,11 @@ export function getBackgroundOptions(preset: EventBackgroundPreset): ISourceOpti
     ...base,
     particles: {
       number: { value: 44 },
-      color: { value: ['#171717', '#666666', '#aaa', '#d4d4d4'] },
-      opacity: { value: { min: 0.22, max: 0.62 } },
+      color: { value: ['#f7ca72', '#abc8ff', '#f3a8c9', '#c8eece'] },
+      opacity: { value: { min: 0.24, max: 0.72 } },
       shape: { type: ['square', 'triangle'] },
       size: { value: { min: 3, max: 8 } },
-      move: { enable: true, speed: 0.9, direction: 'bottom', random: true, outModes: { default: 'out' } },
+      move: { enable: true, speed: 1.05, direction: 'bottom', random: true, outModes: { default: 'out' } },
       rotate: { value: { min: 0, max: 360 }, direction: 'random', animation: { enable: true, speed: 8 } },
     },
   };

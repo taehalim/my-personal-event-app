@@ -369,3 +369,9 @@ body[data-event-editor-background]:is([data-event-editor-background='constellati
 body:has(.editorCanvas[data-tone='dark']) .event-create-back { color: rgba(255,255,255,.72); }
 body[data-event-editor-background]:is([data-event-editor-background='constellation'], [data-event-editor-background='orbit'], [data-event-editor-background='sparkles'], [data-event-editor-background='rain'], [data-event-editor-background='confetti']) .event-editor-link,
 body:has(.editorCanvas[data-tone='dark']) .event-editor-link { color: rgba(255,255,255,.72); }
+
+/* Editing is a live event-page preview: the animation belongs to the viewport, never a rounded editor container. */
+.event-create-shell .event-editor-header { position: relative; z-index: 2; }
+.event-background-full-viewport { position: fixed; inset: 0; min-height: 100dvh; }
+.event-background-full-viewport.event-background-prism { background-size: 180% 180%, 170% 170%, 150% 150%; animation: event-prism-shift 18s ease-in-out infinite alternate; }
+@keyframes event-prism-shift { from { background-position: 0% 0%, 100% 0%, 50% 100%; } to { background-position: 100% 80%, 0% 100%, 10% 0%; } }

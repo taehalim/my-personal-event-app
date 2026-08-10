@@ -194,7 +194,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   };
 
   return <div className={`${styles.editorCanvas} event-theme-${selectedBackground}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
-    <EventBackground preset={selectedBackground} />
+    <EventBackground preset={selectedBackground} fullViewport />
     <form onSubmit={save} className={styles.form}>
     <EventExperienceLayout className={styles.workspace} aside={<div className={styles.sidebar}>
         <div className={styles.preview} aria-label="공개 페이지 미리보기">
