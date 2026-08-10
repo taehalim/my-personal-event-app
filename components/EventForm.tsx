@@ -92,10 +92,21 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const [fieldsDraft, setFieldsDraft] = useState<DraftField[]>((fields ?? []).map(initialField));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const selectedBackground = normalizeBackgroundPreset(backgroundPreset);
+  const isDarkCanvas = ['constellation', 'orbit', 'sparkles', 'rain', 'confetti'].includes(selectedBackground);
 
   useEffect(() => {
     return () => { if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl); };
   }, [coverPreviewUrl]);
+
+  useEffect(() => {
+    document.documentElement.dataset.eventEditorBackground = selectedBackground;
+    document.body.dataset.eventEditorBackground = selectedBackground;
+    return () => {
+      delete document.documentElement.dataset.eventEditorBackground;
+      delete document.body.dataset.eventEditorBackground;
+    };
+  }, [selectedBackground]);
 
   const coverPreview = coverPreviewUrl ?? publicCoverUrl(coverPath);
   const chosenLocation = locationType === 'in_person' ? locationName : locationUrl;
@@ -173,9 +184,6 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
       setLoading(false);
     }
   };
-
-  const selectedBackground = normalizeBackgroundPreset(backgroundPreset);
-  const isDarkCanvas = ['constellation', 'orbit', 'sparkles', 'rain', 'confetti'].includes(selectedBackground);
 
   return <div className={`${styles.editorCanvas} event-theme-${selectedBackground}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
     <EventBackground preset={selectedBackground} />
