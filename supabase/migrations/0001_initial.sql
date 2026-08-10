@@ -6,7 +6,7 @@ create table public.admin_users (
 );
 create table public.events (
   id uuid primary key default gen_random_uuid(), slug varchar(8) not null unique,
-  title text not null, description text not null, cover_image_path text,
+  title text not null, description text not null, cover_image_path text, background_preset text not null default 'plain',
   host_name varchar(80) not null, start_at timestamptz not null, end_at timestamptz not null,
   timezone text not null default 'Asia/Seoul', location_type text not null,
   location_name text, location_url text, map_url text, registration_enabled boolean not null default true,

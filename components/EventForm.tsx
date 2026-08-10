@@ -10,6 +10,7 @@ import { ko } from 'date-fns/locale';
 import { CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, FileText, Globe2, ImagePlus, MapPin, UsersRound, Video, X } from 'lucide-react';
 import type { LamaEvent, RegistrationField, FieldType } from '@/lib/types';
 import { publicCoverUrl } from '@/lib/formatting';
+import { EVENT_BACKGROUND_PRESETS, type EventBackgroundPreset } from '@/lib/event-backgrounds';
 
 type ExistingField = RegistrationField & { sort_order?: number; sortOrder?: number };
 type DraftField = { type: FieldType; label: string; description: string; placeholder: string; required: boolean; optionsText: string };
@@ -97,6 +98,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const [registrationEnabled, setRegistrationEnabled] = useState(event?.registration_enabled ?? true);
   const [coverPath, setCoverPath] = useState(event?.cover_image_path ?? '');
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [backgroundPreset, setBackgroundPreset] = useState<EventBackgroundPreset>(event?.background_preset ?? 'plain');
   const [fieldsDraft, setFieldsDraft] = useState<DraftField[]>((fields ?? []).map(initialField));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -138,6 +140,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         approvalMode,
         status: event ? status : 'published',
         coverImagePath: coverPath || null,
+        backgroundPreset,
         fields: registrationFields,
       };
       const response = await fetch(event ? `/api/admin/events/${event.id}` : '/api/admin/events', { method: event ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -171,6 +174,15 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         <p className="field-hint">JPG, PNG, WEBP · 최대 10MB</p>
         {coverFile && <p className="field-hint">선택됨: {coverFile.name}</p>}
         <div className="event-form-host-preview"><span>주최</span><strong>{hostName}</strong></div>
+        <div className="event-background-picker">
+          <div className="event-background-picker-heading"><strong>배경 효과</strong><span>공개 페이지</span></div>
+          <div className="event-background-options" role="radiogroup" aria-label="배경 효과 선택">
+            {EVENT_BACKGROUND_PRESETS.map(preset => <button type="button" key={preset.id} className={`event-background-option ${backgroundPreset === preset.id ? 'is-selected' : ''}`} onClick={() => setBackgroundPreset(preset.id)} role="radio" aria-checked={backgroundPreset === preset.id}>
+              <span className={`event-background-preview event-background-preview-${preset.id}`} aria-hidden="true"><span /></span>
+              <span className="event-background-option-copy"><strong>{preset.label}</strong><small>{preset.description}</small></span>
+            </button>)}
+          </div>
+        </div>
       </aside>
 
       <div className="event-form-main-panel">

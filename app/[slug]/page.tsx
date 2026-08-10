@@ -13,6 +13,7 @@ import { registrationState } from '@/lib/registration';
 import { appUrl, publicCoverUrl } from '@/lib/formatting';
 import type { LamaEvent, RegistrationField } from '@/lib/types';
 import RegistrationForm from '@/components/RegistrationForm';
+import EventBackground from '@/components/EventBackground';
 
 async function getEvent(slug: string) {
   const supabase = await createClient();
@@ -107,6 +108,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const mapEmbedUrl = getMapEmbedUrl(data.event);
 
   return <main className="public-event-page">
+    <EventBackground preset={data.event.background_preset} />
     <div className="public-event-container">
       <Link href="/" className="public-event-back"><ArrowLeft size={17} strokeWidth={1.8} /><span>Inha의 이벤트</span></Link>
 
