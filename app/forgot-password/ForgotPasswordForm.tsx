@@ -2,13 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
-
-function callbackUrl() {
-  const url = new URL('/auth/callback', window.location.origin);
-  url.searchParams.set('next', '/auth/reset-password');
-  return url.toString();
-}
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
@@ -21,8 +14,9 @@ export default function ForgotPasswordForm() {
     setError('');
     setMessage('');
     setLoading(true);
-    const { error: resetError } = await createClient().auth.resetPasswordForEmail(email, { redirectTo: callbackUrl() });
-    if (resetError) setError('재설정 메일을 보내지 못했습니다. 이메일 주소를 확인해주세요.');
+    const response = await fetch('/api/auth/password-reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+    const result = await response.json() as { error?: { message?: string } };
+    if (!response.ok) setError(result.error?.message ?? '재설정 메일을 보내지 못했습니다.');
     else setMessage('재설정 메일을 보냈습니다. 이메일의 링크를 열어 새 비밀번호를 설정해주세요.');
     setLoading(false);
   }} className="auth-form">
