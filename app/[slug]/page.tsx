@@ -120,7 +120,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               <span className="public-event-person-label">주최자</span>
               <div className="public-event-person">
                 <span className="public-event-avatar public-event-host-avatar" aria-hidden="true">{avatarLabel(data.event.host_name)}</span>
-                <strong>{data.event.host_name}</strong>
+                <span className="public-event-person-name">{data.event.host_name}</span>
               </div>
             </div>
             <div className="public-event-attendance">
@@ -129,10 +129,17 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 <div className="public-event-avatar-stack" aria-label={`참가자 ${data.approvedCount}명`}>
                   {data.participants.map((participant, index) => <span className="public-event-avatar public-event-participant-avatar" data-name={participant.name} tabIndex={0} role="img" aria-label={participant.name} key={`${participant.name}-${index}`}>{avatarLabel(participant.name)}</span>)}
                 </div>
-                <strong>{data.approvedCount}명 참가</strong>
+                <span>{data.approvedCount}명 참가</span>
               </div> : <div className="public-event-no-participants"><UsersRound size={17} strokeWidth={1.7} /><span>아직 참가자가 없어요</span></div>}
             </div>
-            {state === 'open' ? <a className="public-event-sidebar-rsvp" href="#registration">참가 신청 <ArrowRight size={16} strokeWidth={1.8} /></a> : <span className={`public-event-sidebar-rsvp is-${state}`}>{labels[state]}</span>}
+            {state === 'open' ? <a className="public-event-sidebar-rsvp-link" href="#registration">참가 신청 <ArrowRight size={16} strokeWidth={1.8} /></a> : <span className={`public-event-sidebar-rsvp-link is-${state}`}>{labels[state]}</span>}
+            <section className="public-event-rsvp public-event-sidebar-rsvp-card" id="registration">
+              <header className="public-event-rsvp-header">
+                <div><span className="public-event-section-label">참가 신청</span><h2>{state === 'open' ? '이벤트에 참가해 보세요' : labels[state]}</h2></div>
+                <span className={`public-event-rsvp-state is-${state}`}>{labels[state]}</span>
+              </header>
+              {disabled ? <p className="public-event-rsvp-message">{stateDescriptions[state]}</p> : <RegistrationForm eventId={data.event.id} fields={data.fields} initiallyExpanded />}
+            </section>
           </div>
         </aside>
 
@@ -150,14 +157,6 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               <span className="public-event-fact-icon">{data.event.location_type === 'online' ? <Globe2 size={21} strokeWidth={1.7} /> : <MapPin size={21} strokeWidth={1.7} />}</span>
               <div><strong>{location.title}</strong>{location.detail && <span>{location.detail}</span>}{locationHref && <a href={locationHref} target="_blank" rel="noreferrer">{data.event.location_type === 'online' ? '온라인 링크 열기' : '지도에서 보기'} <ExternalLink size={13} strokeWidth={1.8} /></a>}</div>
             </div>
-          </section>
-
-          <section className="public-event-rsvp" id="registration">
-            <header className="public-event-rsvp-header">
-              <div><span className="public-event-section-label">참가 신청</span><h2>{state === 'open' ? '이벤트에 참가해 보세요' : labels[state]}</h2></div>
-              <span className={`public-event-rsvp-state is-${state}`}>{labels[state]}</span>
-            </header>
-            {disabled ? <p className="public-event-rsvp-message">{stateDescriptions[state]}</p> : <RegistrationForm eventId={data.event.id} fields={data.fields} initiallyExpanded />}
           </section>
 
           <section className="public-event-about">
