@@ -5,7 +5,7 @@ import imageCompression from 'browser-image-compression';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { format, parseISO } from 'date-fns';
+import { addHours, format, parseISO } from 'date-fns';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
@@ -89,6 +89,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [backgroundPreset, setBackgroundPreset] = useState<EventBackgroundPreset>(event?.background_preset ?? 'plain');
+  const [sidebarPanel, setSidebarPanel] = useState<'media' | 'style' | null>(null);
   const [fieldsDraft, setFieldsDraft] = useState<DraftField[]>((fields ?? []).map(initialField));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -110,6 +111,13 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
 
   const coverPreview = coverPreviewUrl ?? publicCoverUrl(coverPath);
   const chosenLocation = locationType === 'in_person' ? locationName : locationUrl;
+  const changeStartAt = (nextStart: string) => {
+    setStartAt(nextStart);
+    if (!nextStart) return;
+    const nextStartDate = parseISO(nextStart);
+    const currentEnd = endAt ? parseISO(endAt) : null;
+    if (!currentEnd || Number.isNaN(currentEnd.getTime()) || currentEnd <= nextStartDate) setEndAt(toLocalInputValue(addHours(nextStartDate, 1)));
+  };
   const updateField = (index: number, patch: Partial<DraftField>) => setFieldsDraft(current => current.map((field, fieldIndex) => fieldIndex === index ? { ...field, ...patch } : field));
   const selectCoverFile = (file: File | null) => {
     setCoverFile(file);
@@ -199,8 +207,13 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
           </div>
         </div>
 
-        <section className={styles.mediaSection} aria-labelledby="cover-heading">
-          <div className={styles.sidebarHeading}><span><Images size={16} strokeWidth={1.8} /><strong id="cover-heading">대표 이미지</strong></span><small>공개 페이지에 표시</small></div>
+        <div className={styles.sidebarActions} aria-label="이벤트 스타일 설정">
+          <button type="button" className={sidebarPanel === 'media' ? styles.active : ''} onClick={() => setSidebarPanel(current => current === 'media' ? null : 'media')}><Images size={17} />대표 이미지</button>
+          <button type="button" className={sidebarPanel === 'style' ? styles.active : ''} onClick={() => setSidebarPanel(current => current === 'style' ? null : 'style')}><Sparkles size={17} />페이지 스타일</button>
+        </div>
+
+        {sidebarPanel === 'media' && <section className={styles.assetPanel} aria-labelledby="cover-heading">
+          <div className={styles.sidebarHeading}><span><strong id="cover-heading">대표 이미지 선택</strong></span><button type="button" onClick={() => setSidebarPanel(null)} aria-label="대표 이미지 선택 닫기">×</button></div>
           <label htmlFor="event-cover" className={styles.uploadButton}><ImagePlus size={16} strokeWidth={1.8} />내 이미지 업로드</label>
           <input id="event-cover" className={styles.fileInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } selectCoverFile(file); }} />
           <div className={styles.coverGrid} aria-label="무료 대표 이미지 선택">
@@ -208,17 +221,17 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
               <Image src={image.url} alt={image.label} fill sizes="76px" /><span>{image.label}</span>
             </button>)}
           </div>
-          <p className={styles.hint}>{coverFile ? `${coverFile.name} 선택됨` : 'JPG, PNG, WEBP · 최대 10MB · 무료 이미지 8종'}</p>
-        </section>
+          <p className={styles.hint}>{coverFile ? `${coverFile.name} 선택됨` : '무료 이미지 8종 · JPG, PNG, WEBP · 최대 10MB'}</p>
+        </section>}
 
-        <section className={styles.backgroundSection} aria-labelledby="background-heading">
-          <div className={styles.sidebarHeading}><span><Sparkles size={16} strokeWidth={1.8} /><strong id="background-heading">페이지 배경</strong></span><small>즉시 미리보기</small></div>
+        {sidebarPanel === 'style' && <section className={styles.assetPanel} aria-labelledby="background-heading">
+          <div className={styles.sidebarHeading}><span><strong id="background-heading">페이지 스타일</strong></span><button type="button" onClick={() => setSidebarPanel(null)} aria-label="페이지 스타일 닫기">×</button></div>
           <div className={styles.backgroundGrid} role="radiogroup" aria-label="배경 효과 선택">
             {EVENT_BACKGROUND_PRESETS.map(preset => <button type="button" key={preset.id} className={`${styles.backgroundOption} ${backgroundPreset === preset.id ? styles.selected : ''}`} onClick={() => setBackgroundPreset(preset.id)} role="radio" aria-checked={backgroundPreset === preset.id}>
               <span className={`${styles.backgroundSwatch} ${styles[`background_${preset.id}`]}`} aria-hidden="true" /><span><strong>{preset.label}</strong><small>{preset.description}</small></span>
             </button>)}
           </div>
-        </section>
+        </section>}
 
         <div className={styles.hostPreview}><span>주최자</span><div><b aria-hidden="true">{hostName.slice(0, 2)}</b><strong>{hostName}</strong></div></div>
       </div>}>
@@ -233,7 +246,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
 
         <section className={styles.panel} aria-labelledby="schedule-heading">
           <div className={styles.panelHeading}><div><CalendarDays size={18} strokeWidth={1.8} /><strong id="schedule-heading">일정</strong></div><span><Globe2 size={14} strokeWidth={1.8} />Asia/Seoul</span></div>
-          <div className={styles.scheduleList}><DateTimeControl id="event-start" label="시작" value={startAt} onChange={setStartAt} /><DateTimeControl id="event-end" label="종료" value={endAt} onChange={setEndAt} /></div>
+          <div className={styles.scheduleList}><DateTimeControl id="event-start" label="시작" value={startAt} onChange={changeStartAt} /><DateTimeControl id="event-end" label="종료" value={endAt} onChange={setEndAt} /></div>
         </section>
 
         <section className={styles.panel} aria-labelledby="location-heading">
@@ -261,7 +274,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         <details className={styles.questions} open={fieldsDraft.length > 0}><summary>신청 질문 <span>{fieldsDraft.length ? `${fieldsDraft.length}개` : '추가하지 않음'}</span></summary><div className={styles.questionsContent}><div className={styles.questionToolbar}><p>참가 신청 때 받을 정보를 추가할 수 있어요.</p><button type="button" className={styles.secondaryButton} onClick={() => setFieldsDraft([...fieldsDraft, { type: 'text', label: '', description: '', placeholder: '', required: false, optionsText: '' }])}>+ 질문 추가</button></div>{fieldsDraft.map((field, index) => <div key={index} className={styles.question}><div><strong>질문 {index + 1}</strong><button type="button" onClick={() => setFieldsDraft(fieldsDraft.filter((_, fieldIndex) => fieldIndex !== index))}>삭제</button></div><div className={styles.questionGrid}><label>유형<select value={field.type} onChange={inputEvent => updateField(index, { type: inputEvent.target.value as FieldType })}><option value="text">짧은 답변</option><option value="textarea">긴 답변</option><option value="select">선택</option><option value="checkbox">체크박스</option></select></label><label>질문<input required value={field.label} onChange={inputEvent => updateField(index, { label: inputEvent.target.value })} placeholder="예: 소속을 알려 주세요" /></label></div>{field.type === 'select' && <label>선택지<input required value={field.optionsText} placeholder="개발자:developer, 기획자:planner" onChange={inputEvent => updateField(index, { optionsText: inputEvent.target.value })} /></label>}<label className={styles.questionRequired}><input type="checkbox" checked={field.required} onChange={inputEvent => updateField(index, { required: inputEvent.target.checked })} />필수 질문</label></div>)}</div></details>
 
         {error && <p className={styles.error}>{error}</p>}
-        <div className={styles.actions}><Link href={event ? `/admin/events/${event.id}` : '/admin'} className={styles.cancelButton}>취소</Link><button className={styles.saveButton} disabled={loading}>{loading ? '저장 중...' : event ? '변경사항 저장' : '이벤트 만들기'}</button></div>
+        <div className={styles.actions}><Link href={event ? `/admin/events/${event.id}` : '/admin'} className={styles.cancelButton}>취소</Link><div className={styles.saveGroup}><span>{event ? '변경사항은 공개 페이지에 바로 반영됩니다.' : '만든 즉시 공개 링크로 공유할 수 있어요.'}</span><button className={styles.saveButton} disabled={loading}>{loading ? '저장 중...' : event ? '변경사항 저장' : '이벤트 만들기'}</button></div></div>
       </main>
     </EventExperienceLayout>
     </form>
