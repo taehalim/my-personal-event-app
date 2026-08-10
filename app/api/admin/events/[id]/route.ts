@@ -1,8 +1,40 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getAdmin } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import { eventSchema } from '@/lib/validations';
+
+const storedCoverPath = z.string().regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.webp$/i);
+
+function toEventRow(value: ReturnType<typeof eventSchema.parse>) {
+  return {
+    title: value.title,
+    description: value.description,
+    cover_image_path: value.coverImagePath ?? null,
+    background_preset: value.backgroundPreset,
+    host_name: value.hostName,
+    start_at: value.startAt,
+    end_at: value.endAt,
+    timezone: value.timezone,
+    location_type: value.locationType,
+    location_name: value.locationName ?? null,
+    location_url: value.locationUrl ?? null,
+    map_url: value.mapUrl ?? null,
+    registration_enabled: value.registrationEnabled,
+    registration_open_at: value.registrationOpenAt ?? null,
+    registration_close_at: value.registrationCloseAt ?? null,
+    capacity: value.capacity ?? null,
+    approval_mode: value.approvalMode,
+    status: value.status,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+async function removeStoredCover(path: string | null) {
+  if (!path || !storedCoverPath.safeParse(path).success) return;
+  await createAdminClient().storage.from('event-covers').remove([path]);
+}
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!await getAdmin()) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
@@ -13,10 +45,13 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     supabase.from('registration_fields').select('*').eq('event_id', id).order('sort_order'),
   ]);
   if (error || !event) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
-  const admin = createAdminClient();
-  const { data: registrations } = await admin.from('registrations').select('status').eq('event_id', id);
-  const summary = (registrations ?? []).reduce((acc, registration) => ({ ...acc, [registration.status]: (acc[registration.status] ?? 0) + 1 }), {} as Record<string, number>);
-  return NextResponse.json({ event, fields: fields ?? [], registrationSummary: summary });
+
+  const { data: registrations } = await createAdminClient().from('registrations').select('status').eq('event_id', id);
+  const registrationSummary = (registrations ?? []).reduce<Record<string, number>>((summary, registration) => {
+    summary[registration.status] = (summary[registration.status] ?? 0) + 1;
+    return summary;
+  }, {});
+  return NextResponse.json({ event, fields: fields ?? [], registrationSummary });
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -27,7 +62,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (!existing) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
 
   const body = await request.json();
-  const merged = {
+  const parsed = eventSchema.safeParse({
     title: body.title ?? existing.title,
     description: body.description ?? existing.description,
     hostName: body.hostName ?? existing.host_name,
@@ -47,38 +82,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     approvalMode: body.approvalMode ?? existing.approval_mode,
     status: body.status ?? existing.status,
     fields: body.fields,
-  };
-  const parsed = eventSchema.safeParse(merged);
+  });
   if (!parsed.success) return NextResponse.json({ error: { code: 'INVALID_INPUT', message: parsed.error.issues[0]?.message ?? '입력값을 확인해주세요.' } }, { status: 400 });
 
-  const row = {
-    title: parsed.data.title,
-    description: parsed.data.description,
-    cover_image_path: parsed.data.coverImagePath ?? null,
-    background_preset: parsed.data.backgroundPreset,
-    host_name: parsed.data.hostName,
-    start_at: parsed.data.startAt,
-    end_at: parsed.data.endAt,
-    timezone: parsed.data.timezone,
-    location_type: parsed.data.locationType,
-    location_name: parsed.data.locationName ?? null,
-    location_url: parsed.data.locationUrl ?? null,
-    map_url: parsed.data.mapUrl ?? null,
-    registration_enabled: parsed.data.registrationEnabled,
-    registration_open_at: parsed.data.registrationOpenAt ?? null,
-    registration_close_at: parsed.data.registrationCloseAt ?? null,
-    capacity: parsed.data.capacity ?? null,
-    approval_mode: parsed.data.approvalMode,
-    status: parsed.data.status,
-    updated_at: new Date().toISOString(),
-  };
-  const { data: event, error } = await supabase.from('events').update(row).eq('id', id).select().single();
-  if (error) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error.message } }, { status: 500 });
+  const { data: event, error } = await supabase.from('events').update(toEventRow(parsed.data)).eq('id', id).select().single();
+  if (error || !event) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error?.message ?? '이벤트를 저장하지 못했습니다.' } }, { status: 500 });
 
   if (body.fields !== undefined) {
-    await supabase.from('registration_fields').delete().eq('event_id', id);
+    const { error: deleteFieldsError } = await supabase.from('registration_fields').delete().eq('event_id', id);
+    if (deleteFieldsError) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: '신청 질문을 저장하지 못했습니다.' } }, { status: 500 });
     if (parsed.data.fields?.length) {
-      await supabase.from('registration_fields').insert(parsed.data.fields.map((field, index) => ({
+      const { error: insertFieldsError } = await supabase.from('registration_fields').insert(parsed.data.fields.map((field, index) => ({
         event_id: id,
         type: field.type,
         label: field.label,
@@ -88,8 +102,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         required: field.required,
         sort_order: field.sortOrder ?? index,
       })));
+      if (insertFieldsError) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: '신청 질문을 저장하지 못했습니다.' } }, { status: 500 });
     }
   }
+
+  if (existing.cover_image_path !== event.cover_image_path) await removeStoredCover(existing.cover_image_path);
   return NextResponse.json({ event });
 }
 
@@ -97,7 +114,10 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
   if (!await getAdmin()) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
   const { id } = await params;
   const supabase = await createClient();
+  const { data: existing } = await supabase.from('events').select('cover_image_path').eq('id', id).maybeSingle();
+  if (!existing) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
   const { error } = await supabase.from('events').delete().eq('id', id);
   if (error) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error.message } }, { status: 500 });
+  await removeStoredCover(existing.cover_image_path);
   return new NextResponse(null, { status: 204 });
 }

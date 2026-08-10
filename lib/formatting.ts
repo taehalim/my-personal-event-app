@@ -4,7 +4,9 @@ export function formatEventDate(start: string, end: string, timezone: string) { 
 export function appUrl(path = '') { return `${(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').trim()}${path}`; }
 export function publicCoverUrl(path: string | null) {
   if (!path) return null;
-  if (/^https:\/\//.test(path)) return path;
+  if (/^https:\/\/images\.unsplash\.com\//.test(path)) return path;
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  if (supabaseUrl && path.startsWith(`${supabaseUrl}/storage/v1/object/public/event-covers/`)) return path;
+  if (/^https:\/\//.test(path)) return null;
   return supabaseUrl ? `${supabaseUrl}/storage/v1/object/public/event-covers/${path}` : null;
 }

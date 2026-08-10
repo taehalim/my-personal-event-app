@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, X } from 'lucide-react';
 import type { RegistrationField, RegistrationState } from '@/lib/types';
 import RegistrationForm from '@/components/RegistrationForm';
@@ -18,21 +18,38 @@ export default function RegistrationDrawer({ eventId, fields, state, label, desc
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const canRegister = state === 'open';
+  const close = useCallback(() => {
+    setIsOpen(false);
+    requestAnimationFrame(() => triggerRef.current?.focus());
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsOpen(false);
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKeyDown);
     panelRef.current?.querySelector<HTMLInputElement>('input')?.focus();
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen]);
-
-  const close = () => {
-    setIsOpen(false);
-    requestAnimationFrame(() => triggerRef.current?.focus());
-  };
+  }, [close, isOpen]);
 
   if (!canRegister) return <span className={`public-event-sidebar-rsvp-link is-${state}`}>{label}</span>;
 

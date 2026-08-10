@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format, parseISO } from 'date-fns';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
@@ -28,7 +29,11 @@ function toLocalInputValue(date: Date) {
 function dateTimeValue(value?: string | null) {
   if (!value) return '';
   const parsed = parseISO(value);
-  return Number.isNaN(parsed.getTime()) ? '' : toLocalInputValue(parsed);
+  return Number.isNaN(parsed.getTime()) ? '' : toLocalInputValue(toZonedTime(parsed, 'Asia/Seoul'));
+}
+
+function seoulIso(value: string) {
+  return fromZonedTime(value, 'Asia/Seoul').toISOString();
 }
 
 function googleMapsSearchUrl(location: string) {
@@ -88,23 +93,24 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!coverFile) {
-      setCoverPreviewUrl(null);
-      return;
-    }
-    const objectUrl = URL.createObjectURL(coverFile);
-    setCoverPreviewUrl(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [coverFile]);
+    return () => { if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl); };
+  }, [coverPreviewUrl]);
 
   const coverPreview = coverPreviewUrl ?? publicCoverUrl(coverPath);
   const chosenLocation = locationType === 'in_person' ? locationName : locationUrl;
   const updateField = (index: number, patch: Partial<DraftField>) => setFieldsDraft(current => current.map((field, fieldIndex) => fieldIndex === index ? { ...field, ...patch } : field));
+  const selectCoverFile = (file: File | null) => {
+    setCoverFile(file);
+    setCoverPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
 
   const save = async (submitEvent: React.FormEvent) => {
     submitEvent.preventDefault();
     setLoading(true);
     setError('');
+    let createdEventId: string | null = null;
+    let uploadedPath: string | null = null;
+    let uploadedEventId: string | null = null;
     try {
       if (!title.trim() || !description.trim() || !startAt || !endAt) throw new Error('이벤트 제목, 일정, 소개를 입력해 주세요.');
       if (locationType === 'in_person' && !locationName.trim()) throw new Error('장소를 입력해 주세요.');
@@ -122,16 +128,16 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         title,
         description,
         hostName,
-        startAt: new Date(startAt).toISOString(),
-        endAt: new Date(endAt).toISOString(),
+        startAt: seoulIso(startAt),
+        endAt: seoulIso(endAt),
         timezone: 'Asia/Seoul',
         locationType,
         locationName: locationType === 'in_person' ? locationName : null,
         locationUrl: locationType === 'online' ? locationUrl : null,
         mapUrl: locationType === 'in_person' && locationName.trim() ? googleMapsSearchUrl(locationName) : null,
         registrationEnabled,
-        registrationOpenAt: registrationOpenAt ? new Date(registrationOpenAt).toISOString() : null,
-        registrationCloseAt: registrationCloseAt ? new Date(registrationCloseAt).toISOString() : null,
+        registrationOpenAt: registrationOpenAt ? seoulIso(registrationOpenAt) : null,
+        registrationCloseAt: registrationCloseAt ? seoulIso(registrationCloseAt) : null,
         capacity: capacity ? Number(capacity) : null,
         approvalMode,
         status: event ? status : 'published',
@@ -143,6 +149,8 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
       const json = await response.json();
       if (!response.ok) throw new Error(json.error?.message ?? '저장에 실패했습니다.');
       const id = json.event.id;
+      if (!event) createdEventId = id;
+      uploadedEventId = id;
       if (coverFile) {
         const compressed = await imageCompression(coverFile, { maxSizeMB: 2, maxWidthOrHeight: 1600, useWebWorker: true, fileType: 'image/webp' });
         const formData = new FormData();
@@ -151,11 +159,14 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         const uploadResponse = await fetch('/api/admin/upload', { method: 'POST', body: formData });
         const uploaded = await uploadResponse.json();
         if (!uploadResponse.ok) throw new Error(uploaded.error?.message ?? '이미지 업로드에 실패했습니다.');
+        uploadedPath = uploaded.path;
         const imageResponse = await fetch(`/api/admin/events/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coverImagePath: uploaded.path }) });
         if (!imageResponse.ok) throw new Error('대표 이미지 저장에 실패했습니다.');
       }
       router.push(`/admin/events/${id}`);
     } catch (saveError) {
+      if (uploadedPath && uploadedEventId) await fetch(`/api/admin/upload?eventId=${encodeURIComponent(uploadedEventId)}&path=${encodeURIComponent(uploadedPath)}`, { method: 'DELETE' });
+      if (createdEventId && !event) await fetch(`/api/admin/events/${createdEventId}`, { method: 'DELETE' });
       setError(saveError instanceof Error ? saveError.message : '저장에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -180,9 +191,9 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         <section className={styles.mediaSection} aria-labelledby="cover-heading">
           <div className={styles.sidebarHeading}><span><Images size={16} strokeWidth={1.8} /><strong id="cover-heading">대표 이미지</strong></span><small>공개 페이지에 표시</small></div>
           <label htmlFor="event-cover" className={styles.uploadButton}><ImagePlus size={16} strokeWidth={1.8} />내 이미지 업로드</label>
-          <input id="event-cover" className={styles.fileInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } setCoverFile(file); }} />
+          <input id="event-cover" className={styles.fileInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } selectCoverFile(file); }} />
           <div className={styles.coverGrid} aria-label="무료 대표 이미지 선택">
-            {EVENT_COVER_LIBRARY.map(image => <button type="button" key={image.id} className={`${styles.coverOption} ${coverPath === image.url && !coverFile ? styles.selected : ''}`} onClick={() => { setCoverPath(image.url); setCoverFile(null); }} aria-pressed={coverPath === image.url && !coverFile}>
+            {EVENT_COVER_LIBRARY.map(image => <button type="button" key={image.id} className={`${styles.coverOption} ${coverPath === image.url && !coverFile ? styles.selected : ''}`} onClick={() => { setCoverPath(image.url); selectCoverFile(null); }} aria-pressed={coverPath === image.url && !coverFile}>
               <Image src={image.url} alt={image.label} fill sizes="76px" /><span>{image.label}</span>
             </button>)}
           </div>

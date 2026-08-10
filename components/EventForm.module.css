@@ -1,14 +1,14 @@
-.form { width: 100%; }
+.form { width: min(100%, 1040px); margin: 0 auto; }
 .workspace { display: grid; grid-template-columns: 264px minmax(0, 1fr); gap: 42px; align-items: start; }
 .sidebar { position: sticky; top: 28px; display: grid; gap: 24px; }
-.preview { position: relative; min-height: 286px; overflow: hidden; border-radius: 18px; background: #f5f5f5; isolation: isolate; }
+.preview { position: relative; min-height: 286px; overflow: hidden; border: 1px solid rgba(0,0,0,.04); border-radius: 18px; background: #f8f8f8; isolation: isolate; }
 .preview :global(.event-background-layer) { z-index: 0; }
 .preview :global(.event-background-layer canvas) { opacity: .28; }
 .previewContent { position: relative; z-index: 1; display: grid; height: 100%; align-content: space-between; gap: 14px; padding: 12px; }
 .coverPreview { position: relative; height: 206px; overflow: hidden; border-radius: 12px; background: rgba(255,255,255,.64); }
 .coverPreview img { width: 100%; height: 100%; object-fit: cover; }
 .coverPlaceholder { display: grid; height: 100%; place-content: center; justify-items: center; gap: 8px; color: #999; font-size: 13px; }
-.previewTitle { overflow: hidden; color: #171717; font-size: 16px; font-weight: 650; letter-spacing: -.04em; text-overflow: ellipsis; white-space: nowrap; }
+.previewTitle { overflow: hidden; padding: 1px 2px; color: #171717; font-size: 16px; font-weight: 650; letter-spacing: -.04em; text-overflow: ellipsis; text-shadow: 0 1px 8px rgba(255,255,255,.45); white-space: nowrap; }
 .mediaSection, .backgroundSection { display: grid; gap: 10px; }
 .sidebarHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #555; }
 .sidebarHeading > span { display: inline-flex; align-items: center; gap: 7px; }
