@@ -135,13 +135,6 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               </div> : <div className="public-event-no-participants"><UsersRound size={17} strokeWidth={1.7} /><span>아직 참가자가 없어요</span></div>}
             </div>
             {state === 'open' ? <a className="public-event-sidebar-rsvp-link" href="#registration">참가 신청 <ArrowRight size={16} strokeWidth={1.8} /></a> : <span className={`public-event-sidebar-rsvp-link is-${state}`}>{labels[state]}</span>}
-            <section className="public-event-rsvp public-event-sidebar-rsvp-card" id="registration">
-              <header className="public-event-rsvp-header">
-                <div><span className="public-event-section-label">참가 신청</span><h2>{state === 'open' ? '이벤트에 참가해 보세요' : labels[state]}</h2></div>
-                <span className={`public-event-rsvp-state is-${state}`}>{labels[state]}</span>
-              </header>
-              {disabled ? <p className="public-event-rsvp-message">{stateDescriptions[state]}</p> : <RegistrationForm eventId={data.event.id} fields={data.fields} initiallyExpanded />}
-            </section>
           </div>
         </aside>
 
@@ -159,6 +152,14 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               <span className="public-event-fact-icon">{data.event.location_type === 'online' ? <Globe2 size={21} strokeWidth={1.7} /> : <MapPin size={21} strokeWidth={1.7} />}</span>
               <div><strong>{location.title}</strong>{location.detail && <span>{location.detail}</span>}{locationHref && <a href={locationHref} target="_blank" rel="noreferrer">{data.event.location_type === 'online' ? '온라인 링크 열기' : '지도에서 보기'} <ExternalLink size={13} strokeWidth={1.8} /></a>}</div>
             </div>
+          </section>
+
+          <section className="public-event-rsvp" id="registration">
+            <header className="public-event-rsvp-header">
+              <div><span className="public-event-section-label">참가 신청</span><h2>{state === 'open' ? '이벤트에 참가해 보세요' : labels[state]}</h2></div>
+              <span className={`public-event-rsvp-state is-${state}`}>{labels[state]}</span>
+            </header>
+            {disabled ? <p className="public-event-rsvp-message">{stateDescriptions[state]}</p> : <RegistrationForm eventId={data.event.id} fields={data.fields} initiallyExpanded />}
           </section>
 
           <section className="public-event-about">
