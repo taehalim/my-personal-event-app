@@ -6,9 +6,10 @@ type RegistrationFormProps = {
   eventId: string;
   fields: RegistrationField[];
   disabled?: boolean;
+  initiallyExpanded?: boolean;
 };
 
-export default function RegistrationForm({ eventId, fields, disabled }: RegistrationFormProps) {
+export default function RegistrationForm({ eventId, fields, disabled, initiallyExpanded = false }: RegistrationFormProps) {
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ export default function RegistrationForm({ eventId, fields, disabled }: Registra
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initiallyExpanded);
 
   if (!expanded && !message && !error) {
     return (

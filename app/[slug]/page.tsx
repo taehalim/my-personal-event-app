@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import { ArrowLeft, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -21,9 +21,12 @@ async function getEvent(slug: string) {
 
   const { data: fields } = await supabase.from('registration_fields').select('*').eq('event_id', event.id).order('sort_order');
   const admin = createAdminClient();
-  const { count } = await admin.from('registrations').select('id', { count: 'exact', head: true }).eq('event_id', event.id).eq('status', 'approved');
+  const [{ count }, { data: participantRows }] = await Promise.all([
+    admin.from('registrations').select('id', { count: 'exact', head: true }).eq('event_id', event.id).eq('status', 'approved'),
+    admin.from('registrations').select('name').eq('event_id', event.id).eq('status', 'approved').order('registered_at', { ascending: true }).limit(8),
+  ]);
 
-  return { event: event as LamaEvent, fields: (fields ?? []) as RegistrationField[], approvedCount: count ?? 0 };
+  return { event: event as LamaEvent, fields: (fields ?? []) as RegistrationField[], approvedCount: count ?? 0, participants: (participantRows ?? []) as { name: string }[] };
 }
 
 function formatDateParts(event: LamaEvent) {
@@ -67,6 +70,12 @@ function cleanDescription(description: string) {
   return description.replaceAll('User Uploaded Image', '').replaceAll('\u200b', '');
 }
 
+function avatarLabel(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length > 1) return `${parts[0][0] ?? ''}${parts.at(-1)?.[0] ?? ''}`;
+  return name.trim().slice(0, 2) || '?';
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const data = await getEvent(slug);
@@ -108,13 +117,22 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
           </div>
           <div className="public-event-sidebar-info">
             <div className="public-event-host">
-              <span>주최</span>
-              <strong>{data.event.host_name}</strong>
+              <span className="public-event-person-label">주최자</span>
+              <div className="public-event-person">
+                <span className="public-event-avatar public-event-host-avatar" aria-hidden="true">{avatarLabel(data.event.host_name)}</span>
+                <strong>{data.event.host_name}</strong>
+              </div>
             </div>
             <div className="public-event-attendance">
-              <UsersRound size={18} strokeWidth={1.7} />
-              <strong>{data.approvedCount}명 참가</strong>
+              <span className="public-event-person-label">참가자</span>
+              {data.participants.length ? <div className="public-event-participant-row">
+                <div className="public-event-avatar-stack" aria-label={`참가자 ${data.approvedCount}명`}>
+                  {data.participants.map((participant, index) => <span className="public-event-avatar public-event-participant-avatar" data-name={participant.name} tabIndex={0} role="img" aria-label={participant.name} key={`${participant.name}-${index}`}>{avatarLabel(participant.name)}</span>)}
+                </div>
+                <strong>{data.approvedCount}명 참가</strong>
+              </div> : <div className="public-event-no-participants"><UsersRound size={17} strokeWidth={1.7} /><span>아직 참가자가 없어요</span></div>}
             </div>
+            {state === 'open' ? <a className="public-event-sidebar-rsvp" href="#registration">참가 신청 <ArrowRight size={16} strokeWidth={1.8} /></a> : <span className={`public-event-sidebar-rsvp is-${state}`}>{labels[state]}</span>}
           </div>
         </aside>
 
@@ -134,12 +152,12 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             </div>
           </section>
 
-          <section className="public-event-rsvp">
+          <section className="public-event-rsvp" id="registration">
             <header className="public-event-rsvp-header">
               <div><span className="public-event-section-label">참가 신청</span><h2>{state === 'open' ? '이벤트에 참가해 보세요' : labels[state]}</h2></div>
               <span className={`public-event-rsvp-state is-${state}`}>{labels[state]}</span>
             </header>
-            {disabled ? <p className="public-event-rsvp-message">{stateDescriptions[state]}</p> : <RegistrationForm eventId={data.event.id} fields={data.fields} />}
+            {disabled ? <p className="public-event-rsvp-message">{stateDescriptions[state]}</p> : <RegistrationForm eventId={data.event.id} fields={data.fields} initiallyExpanded />}
           </section>
 
           <section className="public-event-about">
