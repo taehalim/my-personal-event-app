@@ -52,12 +52,12 @@ export default function RegistrationForm({ eventId, fields, disabled, initiallyE
       }}
     >
       <div className="field">
-        <label>이름 *</label>
-        <input required value={name} onChange={event => setName(event.target.value)} disabled={disabled || loading} />
+        <label htmlFor="registration-name">이름 *</label>
+        <input id="registration-name" autoComplete="name" required value={name} onChange={event => setName(event.target.value)} disabled={disabled || loading} />
       </div>
       <div className="field">
-        <label>이메일 *</label>
-        <input required type="email" value={email} onChange={event => setEmail(event.target.value)} disabled={disabled || loading} />
+        <label htmlFor="registration-email">이메일 *</label>
+        <input id="registration-email" autoComplete="email" required type="email" value={email} onChange={event => setEmail(event.target.value)} disabled={disabled || loading} />
       </div>
       {fields.map(field => (
         <div className="field" key={field.id}>

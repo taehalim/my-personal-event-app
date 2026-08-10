@@ -5,14 +5,14 @@ import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import { ArrowLeft, ArrowRight, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { registrationState } from '@/lib/registration';
 import { appUrl, publicCoverUrl } from '@/lib/formatting';
 import type { LamaEvent, RegistrationField } from '@/lib/types';
-import RegistrationForm from '@/components/RegistrationForm';
+import RegistrationDrawer from '@/components/RegistrationDrawer';
 import EventBackground from '@/components/EventBackground';
 
 async function getEvent(slug: string) {
@@ -98,7 +98,6 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   if (!data || data.event.status === 'draft') notFound();
 
   const state = registrationState(data.event, data.approvedCount);
-  const disabled = state !== 'open';
   const labels = { not_open: '신청 시작 전', open: '신청 가능', closed: '신청 마감', full: '정원 마감', cancelled: '취소된 이벤트' };
   const stateDescriptions = { not_open: '신청이 곧 시작됩니다.', open: '참가 신청을 남겨 주세요.', closed: '참가 신청이 마감되었습니다.', full: '참가 정원이 모두 찼습니다.', cancelled: '취소된 이벤트입니다.' };
   const cover = publicCoverUrl(data.event.cover_image_path);
@@ -135,16 +134,9 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                   <span>{data.approvedCount}명 참가</span>
                 </div> : <div className="public-event-no-participants"><UsersRound size={17} strokeWidth={1.7} /><span>아직 참가자가 없어요</span></div>}
               </div>
-              {state === 'open' ? <a className="public-event-sidebar-rsvp-link" href="#registration">참가 신청 <ArrowRight size={16} strokeWidth={1.8} /></a> : <span className={`public-event-sidebar-rsvp-link is-${state}`}>{labels[state]}</span>}
+              <RegistrationDrawer eventId={data.event.id} fields={data.fields} state={state} label={labels[state]} description={stateDescriptions[state]} />
             </div>
           </div>
-          <section className="public-event-rsvp public-event-sidebar-rsvp-card" id="registration">
-            <header className="public-event-rsvp-header">
-              <div><span className="public-event-section-label">참가 신청</span><h2>{state === 'open' ? '이벤트에 참가해 보세요' : labels[state]}</h2></div>
-              <span className={`public-event-rsvp-state is-${state}`}>{labels[state]}</span>
-            </header>
-            {disabled ? <p className="public-event-rsvp-message">{stateDescriptions[state]}</p> : <RegistrationForm eventId={data.event.id} fields={data.fields} initiallyExpanded />}
-          </section>
         </aside>
 
         <article className="public-event-content">
