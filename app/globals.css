@@ -290,6 +290,10 @@ button, input, textarea, select { font: inherit; }
 .auth-card { display: grid; gap: 16px; padding: 32px; margin-top: 22px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--card); box-shadow: var(--shadow-card); }
 .auth-card h1 { margin: 4px 0 0; font-size: 28px; letter-spacing: -.04em; }
 .auth-card p { margin: 0 0 6px; }
+.auth-form { display: grid; gap: 16px; }
+.auth-form-links { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #777; font-size: 13px; }
+.auth-form-links a:hover { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
+.auth-form-message { padding: 11px 12px; margin: 0; border-radius: 9px; background: #f2f7f3; color: #31734a; font-size: 13px; line-height: 1.5; }
 .public-event-page { min-height: 100vh; background: #fff; }
 .public-event-container { width: min(1040px, calc(100% - 48px)); padding: 40px 0 96px; margin: 0 auto; }
 .public-event-back { display: inline-flex; align-items: center; gap: 6px; color: #777; font-size: 14px; }
