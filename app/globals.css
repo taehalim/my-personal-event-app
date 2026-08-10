@@ -457,7 +457,7 @@ button, input, textarea, select { font: inherit; }
 /* Public event layout: keep the event context visible while the detail column scrolls. */
 .public-event-container { width: min(1160px, calc(100% - 64px)); padding: 40px 0 112px; }
 .public-event-layout { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: clamp(36px, 5vw, 56px); margin-top: 48px; }
-.public-event-sidebar { position: static; }
+.public-event-sidebar { position: static; align-self: stretch; }
 .public-event-sidebar-sticky { position: sticky; top: 28px; align-self: start; }
 .public-event-content { width: 100%; max-width: 760px; justify-self: start; }
 .public-event-hero { padding-bottom: 30px; }
