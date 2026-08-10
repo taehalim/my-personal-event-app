@@ -14,9 +14,10 @@ import remarkGfm from 'remark-gfm';
 import { CalendarDays, Check, Clock3, FileText, Globe2, ImagePlus, Images, MapPin, Sparkles, UsersRound, Video } from 'lucide-react';
 import type { FieldType, LamaEvent, RegistrationField } from '@/lib/types';
 import { publicCoverUrl } from '@/lib/formatting';
-import { EVENT_BACKGROUND_PRESETS, type EventBackgroundPreset } from '@/lib/event-backgrounds';
+import { EVENT_BACKGROUND_PRESETS, normalizeBackgroundPreset, type EventBackgroundPreset } from '@/lib/event-backgrounds';
 import { EVENT_COVER_LIBRARY } from '@/lib/cover-library';
 import EventBackground from '@/components/EventBackground';
+import EventExperienceLayout from '@/components/EventExperienceLayout';
 import styles from './EventForm.module.css';
 
 type ExistingField = RegistrationField & { sort_order?: number; sortOrder?: number };
@@ -173,18 +174,20 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
     }
   };
 
-  return <form onSubmit={save} className={styles.form}>
-    <div className={styles.workspace}>
-      <aside className={styles.sidebar}>
+  const selectedBackground = normalizeBackgroundPreset(backgroundPreset);
+  const isDarkCanvas = ['constellation', 'orbit', 'sparkles', 'rain', 'confetti'].includes(selectedBackground);
+
+  return <div className={`${styles.editorCanvas} event-theme-${selectedBackground}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
+    <EventBackground preset={selectedBackground} />
+    <form onSubmit={save} className={styles.form}>
+    <EventExperienceLayout className={styles.workspace} aside={<div className={styles.sidebar}>
         <div className={styles.preview} aria-label="공개 페이지 미리보기">
-          <EventBackground preset={backgroundPreset} />
           <div className={styles.previewContent}>
             <div className={styles.coverPreview}>{coverPreviewUrl ? <>
               {/* Blob URLs cannot be passed through next/image. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={coverPreviewUrl} alt="대표 이미지 미리보기" />
             </> : coverPreview ? <Image src={coverPreview} alt="대표 이미지 미리보기" fill sizes="260px" /> : <span className={styles.coverPlaceholder}><ImagePlus size={24} strokeWidth={1.7} />대표 이미지</span>}</div>
-            <span className={styles.previewTitle}>{title.trim() || '이벤트 제목'}</span>
           </div>
         </div>
 
@@ -209,8 +212,8 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
           </div>
         </section>
 
-        <div className={styles.hostPreview}><span>주최자</span><strong>{hostName}</strong></div>
-      </aside>
+        <div className={styles.hostPreview}><span>주최자</span><div><b aria-hidden="true">{hostName.slice(0, 2)}</b><strong>{hostName}</strong></div></div>
+      </div>}>
 
       <main className={styles.main}>
         <div className={styles.topRow}>
@@ -252,6 +255,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
         {error && <p className={styles.error}>{error}</p>}
         <div className={styles.actions}><Link href={event ? `/admin/events/${event.id}` : '/admin'} className={styles.cancelButton}>취소</Link><button className={styles.saveButton} disabled={loading}>{loading ? '저장 중...' : event ? '변경사항 저장' : '이벤트 만들기'}</button></div>
       </main>
-    </div>
-  </form>;
+    </EventExperienceLayout>
+    </form>
+  </div>;
 }

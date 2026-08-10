@@ -14,6 +14,8 @@ import { appUrl, publicCoverUrl } from '@/lib/formatting';
 import type { LamaEvent, RegistrationField } from '@/lib/types';
 import RegistrationDrawer from '@/components/RegistrationDrawer';
 import EventBackground from '@/components/EventBackground';
+import EventExperienceLayout from '@/components/EventExperienceLayout';
+import { normalizeBackgroundPreset } from '@/lib/event-backgrounds';
 
 async function getEvent(slug: string) {
   const supabase = await createClient();
@@ -105,14 +107,15 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const location = getLocationSummary(data.event);
   const locationHref = data.event.location_type === 'online' ? data.event.location_url : data.event.map_url;
   const mapEmbedUrl = getMapEmbedUrl(data.event);
+  const backgroundPreset = normalizeBackgroundPreset(data.event.background_preset);
+  const isDarkCanvas = ['constellation', 'orbit', 'sparkles', 'rain', 'confetti'].includes(backgroundPreset);
 
-  return <main className="public-event-page">
-    <EventBackground preset={data.event.background_preset} />
+  return <main className={`public-event-page event-theme-${backgroundPreset}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
+    <EventBackground preset={backgroundPreset} />
     <div className="public-event-container">
       <Link href="/" className="public-event-back"><ArrowLeft size={17} strokeWidth={1.8} /><span>Inha의 이벤트</span></Link>
 
-      <div className="public-event-layout">
-        <aside className="public-event-sidebar">
+      <EventExperienceLayout className="public-event-layout" aside={<div className="public-event-sidebar">
           <div className="public-event-sidebar-sticky">
             <div className="public-event-cover">
               {cover ? <Image src={cover} alt="" fill priority sizes="(max-width: 720px) 100vw, 380px" /> : <span aria-hidden="true">I</span>}
@@ -137,7 +140,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               <RegistrationDrawer eventId={data.event.id} fields={data.fields} state={state} label={labels[state]} description={stateDescriptions[state]} />
             </div>
           </div>
-        </aside>
+        </div>}>
 
         <article className="public-event-content">
           <header className="public-event-hero">
@@ -171,7 +174,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             {locationHref && <a className="public-event-map-link" href={locationHref} target="_blank" rel="noreferrer">Google Maps에서 보기 <ExternalLink size={13} strokeWidth={1.8} /></a>}
           </section>}
         </article>
-      </div>
+      </EventExperienceLayout>
     </div>
   </main>;
 }
