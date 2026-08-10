@@ -7,10 +7,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, parseISO, startOfMonth, startOfWeek, subMonths } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, FileText, Globe2, ImagePlus, MapPin, UsersRound, Video, X } from 'lucide-react';
+import { CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, FileText, Globe2, ImagePlus, Images, MapPin, Sparkles, UsersRound, Video, X } from 'lucide-react';
 import type { LamaEvent, RegistrationField, FieldType } from '@/lib/types';
 import { publicCoverUrl } from '@/lib/formatting';
 import { EVENT_BACKGROUND_PRESETS, type EventBackgroundPreset } from '@/lib/event-backgrounds';
+import { EVENT_COVER_LIBRARY } from '@/lib/cover-library';
+import EventBackground from '@/components/EventBackground';
 
 type ExistingField = RegistrationField & { sort_order?: number; sortOrder?: number };
 type DraftField = { type: FieldType; label: string; description: string; placeholder: string; required: boolean; optionsText: string };
@@ -37,23 +39,24 @@ function googleMapsEmbedUrl(location: string) {
 
 function DateTimePicker({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
   const selected = parseDateValue(value);
+  const selectedTime = value ? format(selected, 'HH:mm') : '09:00';
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(startOfMonth(selected));
   useEffect(() => { if (value) setMonth(startOfMonth(parseDateValue(value))); }, [value]);
   const days = eachDayOfInterval({ start: startOfWeek(month, { weekStartsOn: 0 }), end: endOfWeek(endOfMonth(month), { weekStartsOn: 0 }) });
-  const setDate = (date: Date) => { const next = new Date(date); next.setHours(selected.getHours(), selected.getMinutes(), 0, 0); onChange(toLocalInputValue(next)); };
+  const setDate = (date: Date) => { const [hours, minutes] = selectedTime.split(':').map(Number); const next = new Date(date); next.setHours(hours, minutes, 0, 0); onChange(toLocalInputValue(next)); };
   const setTime = (time: string) => { const [hours, minutes] = time.split(':').map(Number); const next = new Date(selected); next.setHours(hours, minutes, 0, 0); onChange(toLocalInputValue(next)); };
   return <div className="event-form-date-row event-form-date-picker" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false); }}>
     <span className="event-form-date-icon" aria-hidden="true"><CalendarDays size={18} strokeWidth={1.8} /></span>
     <span className="event-form-date-label">{label}</span>
     <button type="button" className={`event-date-value ${open ? 'is-open' : ''}`} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(current => !current)}>
-      <CalendarDays size={16} strokeWidth={1.8} aria-hidden="true" /><span>{value ? format(selected, 'M월 d일 (EEE)', { locale: ko }) : '날짜 선택'}</span><span className="event-date-time"><Clock3 size={14} strokeWidth={1.8} aria-hidden="true" />{value ? format(selected, 'HH:mm') : '시간 선택'}</span>
+      <CalendarDays size={16} strokeWidth={1.8} aria-hidden="true" /><span>{value ? format(selected, 'M월 d일 (EEE)', { locale: ko }) : '날짜 선택'}</span>
     </button>
+    <label className="event-date-time-select"><Clock3 size={15} strokeWidth={1.8} aria-hidden="true" /><span className="sr-only">{label} 시간</span><select id={`${id}-time`} value={selectedTime} onChange={event => setTime(event.target.value)}>{timeOptions.map(time => <option key={time} value={time}>{time}</option>)}</select></label>
     {open && <div className="event-date-popover" role="dialog" aria-label={`${label} 날짜와 시간 선택`}>
       <div className="event-date-popover-header"><strong>{format(month, 'yyyy년 M월', { locale: ko })}</strong><div><button type="button" aria-label="이전 달" onClick={() => setMonth(subMonths(month, 1))}><ChevronLeft size={17} /></button><button type="button" aria-label="다음 달" onClick={() => setMonth(addMonths(month, 1))}><ChevronRight size={17} /></button></div></div>
       <div className="event-calendar-weekdays">{calendarWeekdays.map(day => <span key={day}>{day}</span>)}</div>
       <div className="event-calendar-grid">{days.map(day => <button type="button" key={day.toISOString()} className={`${isSameMonth(day, month) ? '' : 'is-outside'} ${isSameDay(day, selected) ? 'is-selected' : ''}`} onClick={() => setDate(day)}>{format(day, 'd')}</button>)}</div>
-      <div className="event-date-time-picker"><Clock3 size={15} aria-hidden="true" /><label htmlFor={`${id}-time`}>시간</label><select id={`${id}-time`} value={format(selected, 'HH:mm')} onChange={event => setTime(event.target.value)}>{timeOptions.map(time => <option key={time} value={time}>{time}</option>)}</select></div>
     </div>}
     <input id={id} type="hidden" value={value} readOnly aria-label={label} />
   </div>;
@@ -98,10 +101,23 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const [registrationEnabled, setRegistrationEnabled] = useState(event?.registration_enabled ?? true);
   const [coverPath, setCoverPath] = useState(event?.cover_image_path ?? '');
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [backgroundPreset, setBackgroundPreset] = useState<EventBackgroundPreset>(event?.background_preset ?? 'plain');
   const [fieldsDraft, setFieldsDraft] = useState<DraftField[]>((fields ?? []).map(initialField));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!coverFile) {
+      setCoverPreviewUrl(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(coverFile);
+    setCoverPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [coverFile]);
+
+  const coverPreview = coverPreviewUrl ?? publicCoverUrl(coverPath);
 
   const updateField = (index: number, patch: Partial<DraftField>) => setFieldsDraft(current => current.map((field, fieldIndex) => fieldIndex === index ? { ...field, ...patch } : field));
 
@@ -168,14 +184,31 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   return <form onSubmit={save} className="admin-form event-form">
     <div className="event-form-workspace">
       <aside className="event-form-media-panel">
-        <div className="event-cover-preview event-cover-preview-large">{coverPath ? <Image src={publicCoverUrl(coverPath) ?? ''} alt="현재 대표 이미지" fill sizes="240px" /> : <span aria-hidden="true"><ImagePlus size={22} strokeWidth={1.7} /><span>대표 이미지</span></span>}</div>
-        <label htmlFor="event-cover" className="event-file-button event-file-button-wide"><ImagePlus size={16} strokeWidth={1.8} />대표 이미지 추가</label>
-        <input id="event-cover" className="event-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } setCoverFile(file); }} />
-        <p className="field-hint">JPG, PNG, WEBP · 최대 10MB</p>
-        {coverFile && <p className="field-hint">선택됨: {coverFile.name}</p>}
+        <div className="event-form-live-preview">
+          <EventBackground preset={backgroundPreset} />
+          <div className="event-form-live-preview-content">
+            <div className="event-cover-preview event-cover-preview-large">{coverPreviewUrl ? <>
+              {/* Local object URLs cannot be served through next/image. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={coverPreviewUrl} alt="대표 이미지 미리보기" />
+            </> : coverPreview ? <Image src={coverPreview} alt="대표 이미지 미리보기" fill sizes="240px" /> : <span aria-hidden="true"><ImagePlus size={22} strokeWidth={1.7} /><span>대표 이미지</span></span>}</div>
+            <strong>{title.trim() || '이벤트 제목'}</strong>
+          </div>
+        </div>
+        <div className="event-cover-controls">
+          <label htmlFor="event-cover" className="event-file-button event-file-button-wide"><ImagePlus size={16} strokeWidth={1.8} />내 이미지 업로드</label>
+          <input id="event-cover" className="event-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={inputEvent => { const file = inputEvent.target.files?.[0] ?? null; if (file && file.size > 10 * 1024 * 1024) { setError('입력 이미지는 10MB 이하여야 합니다.'); return; } setCoverFile(file); }} />
+          <p className="field-hint">JPG, PNG, WEBP · 최대 10MB</p>
+          {coverFile && <p className="field-hint">선택됨: {coverFile.name}</p>}
+        </div>
+        <div className="event-cover-library" aria-labelledby="cover-library-heading">
+          <div className="event-cover-library-heading"><Images size={15} strokeWidth={1.8} /><strong id="cover-library-heading">무료 대표 이미지</strong></div>
+          <div className="event-cover-library-grid">{EVENT_COVER_LIBRARY.map(image => <button type="button" key={image.id} className={`event-cover-library-option ${coverPath === image.url && !coverFile ? 'is-selected' : ''}`} onClick={() => { setCoverPath(image.url); setCoverFile(null); }} aria-pressed={coverPath === image.url && !coverFile}><Image src={image.url} alt="" fill sizes="80px" /><span>{image.label}</span></button>)}</div>
+          <p className="field-hint">Unsplash 무료 이미지 · 업로드 이미지로 언제든 교체할 수 있어요.</p>
+        </div>
         <div className="event-form-host-preview"><span>주최</span><strong>{hostName}</strong></div>
         <div className="event-background-picker">
-          <div className="event-background-picker-heading"><strong>배경 효과</strong><span>공개 페이지</span></div>
+          <div className="event-background-picker-heading"><span><Sparkles size={15} strokeWidth={1.8} /><strong>배경 효과</strong></span><span>미리보기 반영</span></div>
           <div className="event-background-options" role="radiogroup" aria-label="배경 효과 선택">
             {EVENT_BACKGROUND_PRESETS.map(preset => <button type="button" key={preset.id} className={`event-background-option ${backgroundPreset === preset.id ? 'is-selected' : ''}`} onClick={() => setBackgroundPreset(preset.id)} role="radio" aria-checked={backgroundPreset === preset.id}>
               <span className={`event-background-preview event-background-preview-${preset.id}`} aria-hidden="true"><span /></span>
