@@ -352,7 +352,8 @@ body:has(.editorCanvas[data-tone='dark']) .event-editor-link { color: rgba(255,2
 .event-background-react-bits { background: transparent !important; filter: none !important; opacity: 1 !important; animation: none !important; }
 .event-background-react-bits::before, .event-background-react-bits::after { display: none !important; }
 body[data-event-editor-background='aurora'], body:has(.event-theme-aurora),
-body[data-event-editor-background='prism'], body:has(.event-theme-prism) { background: #f5f6fa !important; }
+body[data-event-editor-background='prism'], body:has(.event-theme-prism),
+body[data-event-editor-background='bubbles'], body:has(.event-theme-bubbles) { background: #f5f6fa !important; }
 body[data-event-editor-background='constellation'], body:has(.event-theme-constellation),
 body[data-event-editor-background='orbit'], body:has(.event-theme-orbit),
 body[data-event-editor-background='sparkles'], body:has(.event-theme-sparkles),

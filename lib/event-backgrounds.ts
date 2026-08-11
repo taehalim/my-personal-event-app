@@ -1,13 +1,13 @@
 export const EVENT_BACKGROUND_PRESETS = [
-  { id: 'plain', label: '소프트', description: '은은한 오로라' },
-  { id: 'aurora', label: '오로라', description: '천천히 흐르는 빛' },
-  { id: 'prism', label: '프리즘', description: '은은한 색의 굴절' },
-  { id: 'constellation', label: '워프', description: '흐르는 빛의 궤적' },
-  { id: 'orbit', label: '궤도', description: '원을 그리는 입자' },
-  { id: 'bubbles', label: '버블', description: '떠오르는 원형 입자' },
-  { id: 'sparkles', label: '스파클', description: '살짝 숨 쉬는 광선' },
-  { id: 'rain', label: '레이즈', description: '흐르는 빛의 결' },
-  { id: 'confetti', label: '플레어', description: '퍼지는 색의 빛' },
+  { id: 'plain', label: '소프트', description: '잔잔한 오로라' },
+  { id: 'aurora', label: '오로라', description: '부드러운 색의 흐름' },
+  { id: 'prism', label: '프리즘', description: '빛의 굴절' },
+  { id: 'constellation', label: '워프', description: '공간을 가르는 궤적' },
+  { id: 'orbit', label: '스레드', description: '유영하는 빛의 선' },
+  { id: 'bubbles', label: '미스트', description: '떠다니는 색의 안개' },
+  { id: 'sparkles', label: '글로우', description: '호흡하는 광선' },
+  { id: 'rain', label: '드리프트', description: '천천히 흐르는 속도감' },
+  { id: 'confetti', label: '플레어', description: '색이 번지는 질주' },
 ] as const;
 
 export type EventBackgroundPreset = typeof EVENT_BACKGROUND_PRESETS[number]['id'];
