@@ -4,7 +4,8 @@
 .editorCanvas :global(.event-background-full-viewport) { position: fixed; inset: 0; }
 .editorCanvas :global(.event-background-layer canvas) { opacity: .42; }
 .editorCanvas[data-tone='dark'] :global(.event-background-layer canvas) { opacity: .52; }
-.editorCanvas[data-tone='dark']::after { position: fixed; z-index: 0; inset: 0; background: rgba(12, 13, 17, .52); content: ''; pointer-events: none; }
+.editorCanvas :global(.event-background-react-bits canvas) { opacity: 1; }
+.editorCanvas[data-tone='dark']::after { position: fixed; z-index: 0; inset: 0; background: rgba(12, 13, 17, .24); content: ''; pointer-events: none; }
 .form { position: relative; z-index: 1; width: min(100%, 1120px); margin: 0 auto; }
 .workspace { display: grid; grid-template-columns: minmax(240px, 280px) minmax(0, 1fr); gap: clamp(32px, 5vw, 56px); align-items: start; }
 .sidebar { position: sticky; top: 28px; display: grid; gap: 22px; }

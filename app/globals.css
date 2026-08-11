@@ -274,24 +274,12 @@ button, input, textarea, select { font: inherit; }
   .public-event-about { padding-top: 24px; }
 }
 
-/* Selectable event backgrounds: decorative, quiet, and always behind readable content. */
+/* Selectable event backgrounds are all live React Bits canvas layers. */
 .public-event-page { position: relative; isolation: isolate; overflow: clip; }
 .public-event-container { position: relative; z-index: 1; }
 .event-background-layer { position: absolute; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; }
 .event-background-layer > div { width: 100%; height: 100%; }
 .event-background-layer canvas { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; opacity: .24; }
-.event-background-aurora { opacity: .76; background: radial-gradient(circle at 18% 18%, rgba(194, 218, 255, .66), transparent 34%), radial-gradient(circle at 82% 22%, rgba(255, 218, 232, .62), transparent 31%), radial-gradient(circle at 56% 88%, rgba(220, 244, 229, .62), transparent 35%); filter: saturate(.72); }
-.event-background-aurora::before, .event-background-aurora::after { position: absolute; width: 58vw; height: 34vw; border-radius: 50%; content: ''; filter: blur(36px); opacity: .42; transform: rotate(-18deg); }
-.event-background-aurora::before { top: 8%; left: -12%; background: rgba(170, 202, 255, .32); animation: event-background-drift 18s ease-in-out infinite alternate; }
-.event-background-aurora::after { right: -12%; bottom: 12%; background: rgba(255, 193, 217, .28); animation: event-background-drift 22s ease-in-out -7s infinite alternate-reverse; }
-.event-background-prism { opacity: .42; background: linear-gradient(115deg, transparent 18%, rgba(190, 215, 255, .25) 34%, transparent 45%), linear-gradient(245deg, transparent 28%, rgba(255, 214, 228, .24) 42%, transparent 56%), linear-gradient(25deg, transparent 48%, rgba(207, 240, 224, .25) 60%, transparent 72%); }
-.event-background-constellation { background-color: #fafafa; background-image: radial-gradient(circle at 18% 22%, rgba(20,20,20,.24) 0 1px, transparent 1.8px), radial-gradient(circle at 73% 17%, rgba(20,20,20,.18) 0 1px, transparent 1.8px), radial-gradient(circle at 60% 74%, rgba(20,20,20,.2) 0 1px, transparent 1.8px), linear-gradient(28deg, transparent 49.8%, rgba(30,30,30,.08) 50%, transparent 50.2%), linear-gradient(148deg, transparent 49.8%, rgba(30,30,30,.06) 50%, transparent 50.2%); background-size: 190px 160px, 230px 210px, 260px 220px, 170px 170px, 210px 210px; }
-.event-background-orbit { background: radial-gradient(ellipse at 55% 45%, transparent 0 16%, rgba(28,28,28,.09) 16.4% 16.8%, transparent 17.2% 29%, rgba(28,28,28,.07) 29.4% 29.8%, transparent 30.2%), #fafafa; }
-.event-background-bubbles { background: radial-gradient(circle at 18% 76%, rgba(50,50,50,.08) 0 2.5%, transparent 2.7%), radial-gradient(circle at 77% 24%, rgba(50,50,50,.1) 0 3.4%, transparent 3.6%), radial-gradient(circle at 58% 72%, rgba(50,50,50,.07) 0 1.5%, transparent 1.7%), #fafafa; }
-.event-background-sparkles { background-color: #fbfbfb; background-image: radial-gradient(circle at 16% 23%, rgba(20,20,20,.25) 0 1px, transparent 1.5px), radial-gradient(circle at 76% 19%, rgba(20,20,20,.18) 0 1px, transparent 1.5px), radial-gradient(circle at 57% 69%, rgba(20,20,20,.17) 0 1px, transparent 1.5px); background-size: 160px 140px, 210px 190px, 240px 210px; }
-.event-background-rain { background: repeating-linear-gradient(106deg, transparent 0 18px, rgba(35,35,35,.07) 19px 20px, transparent 21px 38px), #fafafa; }
-.event-background-confetti { background-color: #fafafa; background-image: linear-gradient(30deg, transparent 48%, rgba(25,25,25,.13) 49% 52%, transparent 53%), linear-gradient(128deg, transparent 46%, rgba(80,80,80,.12) 47% 51%, transparent 52%); background-size: 90px 82px, 116px 104px; }
-@keyframes event-background-drift { from { transform: translate3d(-4%, -2%, 0) rotate(-18deg) scale(.98); } to { transform: translate3d(7%, 5%, 0) rotate(-8deg) scale(1.08); } }
 
 /* Registration is an independent panel so it never scrolls underneath the sticky event context. */
 .public-event-sidebar button.public-event-sidebar-rsvp-link { width: 100%; border: 0; cursor: pointer; text-align: left; }
@@ -347,24 +335,9 @@ button, input, textarea, select { font: inherit; }
 .public-event-page[data-tone='dark'] .public-event-description a { color: #fff; }
 .public-event-page[data-tone='dark'] .public-event-map { background: rgba(255,255,255,.1); }
 
-/* A selected dark theme is visible before particles load; particles only enhance it. */
-.event-background-constellation { background-color: #111216; background-image: radial-gradient(circle at 18% 22%, rgba(255,255,255,.82) 0 1px, transparent 1.8px), radial-gradient(circle at 73% 17%, rgba(170,196,255,.72) 0 1px, transparent 1.8px), radial-gradient(circle at 60% 74%, rgba(255,214,240,.68) 0 1px, transparent 1.8px), linear-gradient(28deg, transparent 49.8%, rgba(141,178,255,.12) 50%, transparent 50.2%), linear-gradient(148deg, transparent 49.8%, rgba(255,183,215,.1) 50%, transparent 50.2%); }
-.event-background-orbit { background: radial-gradient(ellipse at 55% 45%, transparent 0 16%, rgba(191,211,255,.22) 16.4% 16.8%, transparent 17.2% 29%, rgba(255,191,216,.16) 29.4% 29.8%, transparent 30.2%), #111216; }
-.event-background-sparkles { background-color: #111216; background-image: radial-gradient(circle at 16% 23%, rgba(255,255,255,.84) 0 1px, transparent 1.5px), radial-gradient(circle at 76% 19%, rgba(255,218,145,.72) 0 1px, transparent 1.5px), radial-gradient(circle at 57% 69%, rgba(177,214,255,.68) 0 1px, transparent 1.5px); }
-.event-background-rain { background: repeating-linear-gradient(106deg, transparent 0 18px, rgba(178,205,255,.16) 19px 20px, transparent 21px 38px), #111216; }
-.event-background-confetti { background-color: #111216; background-image: linear-gradient(30deg, transparent 48%, rgba(255,211,118,.4) 49% 52%, transparent 53%), linear-gradient(128deg, transparent 46%, rgba(170,190,255,.35) 47% 51%, transparent 52%), linear-gradient(72deg, transparent 48%, rgba(255,174,211,.28) 49% 53%, transparent 54%); }
-
 /* The selected editor theme owns the entire browser canvas, not only the form card. */
 html:has(.editorCanvas[data-tone='dark']), body:has(.editorCanvas[data-tone='dark']) { background-color: #111216; }
 body[data-event-editor-background], body:has(.editorCanvas) { min-height: 100vh; }
-body[data-event-editor-background='constellation'], body:has(.event-theme-constellation) { background-color: #111216; background-image: radial-gradient(circle at 18% 22%, rgba(255,255,255,.42) 0 1px, transparent 1.8px), radial-gradient(circle at 73% 17%, rgba(170,196,255,.34) 0 1px, transparent 1.8px), linear-gradient(28deg, transparent 49.8%, rgba(141,178,255,.055) 50%, transparent 50.2%); background-size: 190px 160px, 230px 210px, 170px 170px; }
-body[data-event-editor-background='orbit'], body:has(.event-theme-orbit) { background: radial-gradient(ellipse at 55% 45%, transparent 0 16%, rgba(191,211,255,.09) 16.4% 16.8%, transparent 17.2% 29%, rgba(255,191,216,.065) 29.4% 29.8%, transparent 30.2%), #111216; }
-body[data-event-editor-background='sparkles'], body:has(.event-theme-sparkles) { background-color: #111216; background-image: radial-gradient(circle at 16% 23%, rgba(255,255,255,.44) 0 1px, transparent 1.5px), radial-gradient(circle at 76% 19%, rgba(255,218,145,.36) 0 1px, transparent 1.5px), radial-gradient(circle at 57% 69%, rgba(177,214,255,.34) 0 1px, transparent 1.5px); background-size: 160px 140px, 210px 190px, 240px 210px; }
-body[data-event-editor-background='rain'], body:has(.event-theme-rain) { background: repeating-linear-gradient(106deg, transparent 0 18px, rgba(178,205,255,.075) 19px 20px, transparent 21px 38px), #111216; }
-body[data-event-editor-background='confetti'], body:has(.event-theme-confetti) { background-color: #111216; background-image: linear-gradient(30deg, transparent 48%, rgba(255,211,118,.16) 49% 52%, transparent 53%), linear-gradient(128deg, transparent 46%, rgba(170,190,255,.14) 47% 51%, transparent 52%), linear-gradient(72deg, transparent 48%, rgba(255,174,211,.11) 49% 53%, transparent 54%); background-size: 90px 82px, 116px 104px, 130px 120px; }
-body[data-event-editor-background='aurora'], body:has(.event-theme-aurora) { background: radial-gradient(circle at 18% 18%, rgba(194,218,255,.66), transparent 34%), radial-gradient(circle at 82% 22%, rgba(255,218,232,.62), transparent 31%), radial-gradient(circle at 56% 88%, rgba(220,244,229,.62), transparent 35%), #f7f8f9; }
-body[data-event-editor-background='prism'], body:has(.event-theme-prism) { background: linear-gradient(115deg, transparent 18%, rgba(190,215,255,.4) 34%, transparent 45%), linear-gradient(245deg, transparent 28%, rgba(255,214,228,.38) 42%, transparent 56%), #f8f8f8; }
-body[data-event-editor-background='plain'], body:has(.event-theme-plain) { background: #fff; }
 body[data-event-editor-background]:is([data-event-editor-background='constellation'], [data-event-editor-background='orbit'], [data-event-editor-background='sparkles'], [data-event-editor-background='rain'], [data-event-editor-background='confetti']) .event-create-back,
 body:has(.editorCanvas[data-tone='dark']) .event-create-back { color: rgba(255,255,255,.72); }
 body[data-event-editor-background]:is([data-event-editor-background='constellation'], [data-event-editor-background='orbit'], [data-event-editor-background='sparkles'], [data-event-editor-background='rain'], [data-event-editor-background='confetti']) .event-editor-link,
@@ -373,5 +346,15 @@ body:has(.editorCanvas[data-tone='dark']) .event-editor-link { color: rgba(255,2
 /* Editing is a live event-page preview: the animation belongs to the viewport, never a rounded editor container. */
 .event-create-shell .event-editor-header { position: relative; z-index: 2; }
 .event-background-full-viewport { position: fixed; inset: 0; min-height: 100dvh; }
-.event-background-full-viewport.event-background-prism { background-size: 180% 180%, 170% 170%, 150% 150%; animation: event-prism-shift 18s ease-in-out infinite alternate; }
-@keyframes event-prism-shift { from { background-position: 0% 0%, 100% 0%, 50% 100%; } to { background-position: 100% 80%, 0% 100%, 10% 0%; } }
+
+/* React Bits effects own their canvas completely. Legacy preset textures must
+   not remain underneath or visually turn an animated style into a static one. */
+.event-background-react-bits { background: transparent !important; filter: none !important; opacity: 1 !important; animation: none !important; }
+.event-background-react-bits::before, .event-background-react-bits::after { display: none !important; }
+body[data-event-editor-background='aurora'], body:has(.event-theme-aurora),
+body[data-event-editor-background='prism'], body:has(.event-theme-prism) { background: #f5f6fa !important; }
+body[data-event-editor-background='constellation'], body:has(.event-theme-constellation),
+body[data-event-editor-background='orbit'], body:has(.event-theme-orbit),
+body[data-event-editor-background='sparkles'], body:has(.event-theme-sparkles),
+body[data-event-editor-background='rain'], body:has(.event-theme-rain),
+body[data-event-editor-background='confetti'], body:has(.event-theme-confetti) { background: #0b0c11 !important; }
