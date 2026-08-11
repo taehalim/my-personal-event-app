@@ -1,9 +1,12 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Aurora from '@/components/react-bits/Aurora';
 import LightRays from '@/components/react-bits/LightRays';
 import Threads from '@/components/react-bits/Threads';
 import type { EventBackgroundPreset } from '@/lib/event-backgrounds';
+
+const Warp = dynamic(() => import('@/components/react-bits/Warp'), { ssr: false });
 
 // React Bits (DavidHDev/react-bits) free background components, adapted only
 // for the app's viewport layer. They never render a card, border, or surface.
@@ -17,7 +20,7 @@ export default function ReactBitsBackground({ preset }: { preset: EventBackgroun
   }
 
   if (preset === 'constellation') {
-    return <Threads color={[0.52, 0.68, 1]} amplitude={1.3} distance={0.12} enableMouseInteraction={false} />;
+    return <Warp />;
   }
 
   if (preset === 'rain') {
@@ -26,6 +29,10 @@ export default function ReactBitsBackground({ preset }: { preset: EventBackgroun
 
   if (preset === 'sparkles' || preset === 'confetti') {
     return <LightRays raysOrigin="bottom-center" raysColor={preset === 'sparkles' ? '#d9c5ff' : '#ffd39c'} raysSpeed={0.45} lightSpread={1.1} rayLength={1.4} pulsating fadeDistance={1.15} saturation={1.2} noiseAmount={0.24} distortion={0.32} />;
+  }
+
+  if (preset === 'orbit') {
+    return <Threads color={[0.52, 0.68, 1]} amplitude={1.3} distance={0.12} enableMouseInteraction={false} />;
   }
 
   return null;

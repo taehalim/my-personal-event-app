@@ -8,7 +8,7 @@ const ReactBitsBackground = dynamic(() => import('@/components/ReactBitsBackgrou
 
 export default function EventBackground({ preset, fullViewport = false }: { preset?: string | null; fullViewport?: boolean }) {
   const selected = normalizeBackgroundPreset(preset);
-  const usesReactBits = ['aurora', 'prism', 'constellation', 'sparkles', 'rain', 'confetti'].includes(selected);
+  const usesReactBits = ['aurora', 'prism', 'constellation', 'orbit', 'sparkles', 'rain', 'confetti'].includes(selected);
   const usesParticles = !usesReactBits && selected !== 'plain';
 
   return <div className={`event-background-layer event-background-${selected}${fullViewport ? ' event-background-full-viewport' : ''}`} aria-hidden="true">
