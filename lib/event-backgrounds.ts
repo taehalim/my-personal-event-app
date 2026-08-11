@@ -4,12 +4,12 @@ export const EVENT_BACKGROUND_PRESETS = [
   { id: 'plain', label: '기본', description: '깨끗한 흰 배경' },
   { id: 'aurora', label: '오로라', description: '천천히 흐르는 빛' },
   { id: 'prism', label: '프리즘', description: '은은한 색의 굴절' },
-  { id: 'constellation', label: '별자리', description: '점과 선의 네트워크' },
+  { id: 'constellation', label: '워프', description: '흐르는 빛의 궤적' },
   { id: 'orbit', label: '궤도', description: '원을 그리는 입자' },
   { id: 'bubbles', label: '버블', description: '떠오르는 원형 입자' },
-  { id: 'sparkles', label: '스파클', description: '반짝이는 별가루' },
-  { id: 'rain', label: '레인', description: '가볍게 내리는 선' },
-  { id: 'confetti', label: '컨페티', description: '느리게 흩날리는 조각' },
+  { id: 'sparkles', label: '스파클', description: '살짝 숨 쉬는 광선' },
+  { id: 'rain', label: '레이즈', description: '흐르는 빛의 결' },
+  { id: 'confetti', label: '플레어', description: '퍼지는 색의 빛' },
 ] as const;
 
 export type EventBackgroundPreset = typeof EVENT_BACKGROUND_PRESETS[number]['id'];
