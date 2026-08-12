@@ -114,7 +114,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   return <main className={`public-event-page event-theme-${backgroundPreset}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
     <EventBackground preset={backgroundPreset} fullViewport />
     <div className="public-event-container">
-      <EventCanvasFrame header={<Link href="/" className="public-event-back"><ArrowLeft size={17} strokeWidth={1.8} /><span>{data.event.host_name}의 이벤트</span></Link>}>
+      <EventCanvasFrame header={<Link href="/" className="event-canvas-back"><ArrowLeft size={17} strokeWidth={1.8} /><span>{data.event.host_name}의 이벤트</span></Link>}>
         <EventExperienceLayout className="public-event-layout" aside={<div className="public-event-sidebar">
           <div className="public-event-sidebar-sticky">
             <div className="public-event-cover">

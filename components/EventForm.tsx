@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { addHours, format, parseISO } from 'date-fns';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
-import { CalendarDays, Check, Clock3, FileText, Globe2, ImagePlus, Images, MapPin, Sparkles, UsersRound, Video } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Check, Clock3, FileText, Globe2, ImagePlus, Images, MapPin, Sparkles, UsersRound, Video } from 'lucide-react';
 import type { FieldType, LamaEvent, RegistrationField } from '@/lib/types';
 import { publicCoverUrl } from '@/lib/formatting';
 import { EVENT_BACKGROUND_PRESETS, isDarkEventBackground, normalizeBackgroundPreset, type EventBackgroundPreset } from '@/lib/event-backgrounds';
@@ -196,7 +196,7 @@ export default function EventForm({ event, fields, hostName: suppliedHostName }:
   return <div className={`${styles.editorCanvas} event-theme-${selectedBackground}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
     <EventBackground preset={selectedBackground} fullViewport />
     <EventCanvasFrame header={<>
-      <Link href="/admin" className="event-create-back">← {hostName}의 이벤트</Link>
+      <Link href="/admin" className="event-canvas-back"><ArrowLeft size={17} strokeWidth={1.8} aria-hidden="true" /><span>{hostName}의 이벤트</span></Link>
       {event && <div className="event-editor-actions">
         <a href={`/${event.slug}`} target="_blank" rel="noreferrer" className="event-editor-link">공개 링크 보기 ↗</a>
         <Link href={`/admin/events/${event.id}/registrations`} className="event-editor-link">참가자 관리</Link>
@@ -245,7 +245,7 @@ export default function EventForm({ event, fields, hostName: suppliedHostName }:
       </div>}>
 
       <main className={styles.main}>
-        <div className={styles.topRow}>
+        <div className={styles.editMeta}>
           <span>{event ? '이벤트 편집' : '새 이벤트'}</span>
           {event && <label className={styles.statusControl}><Globe2 size={15} strokeWidth={1.8} aria-hidden="true" /><span>공개 상태</span><select value={status} onChange={inputEvent => setStatus(inputEvent.target.value as 'draft' | 'published' | 'cancelled')}><option value="published">공개</option><option value="draft">비공개 초안</option><option value="cancelled">취소</option></select></label>}
         </div>

@@ -177,8 +177,8 @@ button, input, textarea, select { font: inherit; }
 .auth-form-message { padding: 11px 12px; margin: 0; border-radius: 9px; background: #f2f7f3; color: #31734a; font-size: 13px; line-height: 1.5; }
 .public-event-page { --event-action-bg: #171717; --event-action-fg: #fff; min-height: 100vh; background: #fff; }
 .public-event-container { width: min(var(--event-canvas-width), calc(100% - 48px)); padding: 40px 0 96px; margin: 0 auto; }
-.public-event-back { display: inline-flex; align-items: center; gap: 6px; color: #777; font-size: 14px; }
-.public-event-back:hover { color: var(--foreground); }
+.event-canvas-back { display: inline-flex; align-items: center; gap: 6px; color: #777; font-size: 14px; line-height: 1.4; text-decoration: none; }
+.event-canvas-back:hover { color: var(--foreground); }
 .event-experience-layout { display: grid; grid-template-columns: minmax(216px, 232px) minmax(0, 1fr); align-items: start; gap: 32px; }
 .public-event-layout { margin-top: 40px; }
 .public-event-sidebar { min-width: 0; }
@@ -366,7 +366,7 @@ button, input, textarea, select { font: inherit; }
 .public-event-container { width: 100%; padding: 0; margin: 0; }
 .public-event-layout { margin-top: 0; }
 .public-event-page[data-tone='dark'] { --foreground: #f5f5f7; --border: rgba(255,255,255,.16); --event-action-bg: #f5f5f7; --event-action-fg: #171717; min-height: 100vh; color: var(--foreground); background: #111216; }
-.public-event-page[data-tone='dark'] .public-event-back,
+.public-event-page[data-tone='dark'] .event-canvas-back,
 .public-event-page[data-tone='dark'] .public-event-person-label,
 .public-event-page[data-tone='dark'] .public-event-fact span,
 .public-event-page[data-tone='dark'] .public-event-fact a,
@@ -409,8 +409,8 @@ button, input, textarea, select { font: inherit; }
 /* The selected editor theme owns the entire browser canvas, not only the form card. */
 html:has(.editorCanvas[data-tone='dark']), body:has(.editorCanvas[data-tone='dark']) { background-color: #111216; }
 body[data-event-editor-background], body:has(.editorCanvas) { min-height: 100vh; }
-body[data-event-editor-tone='dark'] .event-create-back,
-body:has(.editorCanvas[data-tone='dark']) .event-create-back { color: rgba(255,255,255,.72); }
+body[data-event-editor-tone='dark'] .event-canvas-back,
+body:has(.editorCanvas[data-tone='dark']) .event-canvas-back { color: rgba(255,255,255,.72); }
 body[data-event-editor-tone='dark'] .event-editor-link,
 body:has(.editorCanvas[data-tone='dark']) .event-editor-link { color: rgba(255,255,255,.72); }
 body[data-event-editor-tone='dark'] .event-editor-link:hover,
