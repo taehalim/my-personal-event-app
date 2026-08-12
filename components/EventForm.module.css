@@ -104,7 +104,7 @@
 .settingsGroup { gap: 48px; padding: 0; }
 .eventSection { gap: 18px; }
 .sectionHeading { display: flex; min-height: 28px; align-items: center; justify-content: space-between; gap: 16px; }
-.sectionHeading h2 { margin: 0; color: var(--canvas-fg); font-size: 22px; font-weight: 550; letter-spacing: -.055em; line-height: 1.2; }
+.sectionHeading h2 { margin: 0; color: var(--canvas-fg); font-size: var(--event-section-heading-size); letter-spacing: var(--event-section-heading-tracking); }
 .sectionMeta { color: var(--canvas-muted); font-size: 13px; }
 .scheduleList { gap: 12px; }
 .scheduleRow { grid-template-columns: 52px minmax(0, 1fr) 120px; gap: 12px; }
@@ -137,7 +137,6 @@
 @media (max-width: 480px) {
   .titleField { padding-bottom: 38px; }
   .settingsGroup { gap: 38px; }
-  .sectionHeading h2 { font-size: 20px; }
   .scheduleRow { grid-template-columns: 1fr 1fr; gap: 8px; }
   .scheduleLabel { grid-column: 1 / -1; margin-bottom: 2px; }
   .dateInput { grid-column: 1 / -1; }
