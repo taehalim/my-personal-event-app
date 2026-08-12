@@ -99,11 +99,28 @@
 .editorCanvas[data-tone='dark'] .saveButton { background: #f5f5f7; color: #171717; }
 .editorCanvas[data-tone='dark'] .saveButton:hover { background: #fff; }
 
-/* The editor borrows the public page's typographic hierarchy instead of creating card-like form sections. */
-.settingsGroup { gap: 34px; }
-.settingsGroup + .settingsGroup { padding-top: 54px; }
-.settingsGroupHeading { margin-bottom: 2px; }
-.settingsGroupHeading strong { font-weight: 550; letter-spacing: -.04em; }
+/* The editor uses the same reading order as the public event: time, wayfinding, story. */
+.titleField { padding: 0 0 48px; }
+.settingsGroup { gap: 48px; padding: 0; }
+.eventSection { gap: 18px; }
+.sectionHeading { display: flex; min-height: 28px; align-items: center; justify-content: space-between; gap: 16px; }
+.sectionHeading h2 { margin: 0; color: var(--canvas-fg); font-size: 22px; font-weight: 550; letter-spacing: -.055em; line-height: 1.2; }
+.sectionMeta { color: var(--canvas-muted); font-size: 13px; }
+.scheduleList { gap: 12px; }
+.scheduleRow { grid-template-columns: 52px minmax(0, 1fr) 120px; gap: 12px; }
+.scheduleLabel { color: var(--canvas-muted); font-size: 14px; font-weight: 500; }
+.dateInput, .timeInput { height: 46px; border-radius: 12px; }
+.locationInput { min-height: 52px; padding: 0 16px; border-radius: 12px; }
+.markdownEditor { min-height: 190px; }
+.markdownEditorContent { min-height: 180px; }
+.attendeeSettings { margin-top: 52px; color: var(--canvas-fg); }
+.attendeeSettings > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; cursor: pointer; list-style: none; color: var(--canvas-muted); font-size: 14px; }
+.attendeeSettings > summary::-webkit-details-marker { display: none; }
+.attendeeSettings > summary > span { color: var(--canvas-fg); font-weight: 550; letter-spacing: -.03em; }
+.attendeeSettings > summary > small { color: var(--canvas-muted); font-size: 12px; }
+.attendeeSettingsContent { display: grid; gap: 16px; padding-top: 18px; }
+.statusRow { display: flex; min-height: 46px; align-items: center; justify-content: space-between; gap: 18px; color: var(--canvas-muted); font-size: 14px; }
+.statusRow select { border: 0; outline: 0; background: transparent; color: var(--canvas-fg); font: inherit; text-align: right; }
 .actions { position: static; z-index: auto; margin: 44px 0 0; padding: 0 0 20px; border-radius: 0; background: transparent; backdrop-filter: none; }
 .cancelButton { background: transparent; color: var(--canvas-muted); }
 .cancelButton:hover { background: var(--canvas-control); color: var(--canvas-fg); }
@@ -114,5 +131,16 @@
 
 @media (max-width: 820px) {
   .main { gap: 0; }
-  .editMeta { margin-bottom: 14px; }
+  .scheduleRow { grid-template-columns: 50px minmax(0, 1fr) 112px; }
+}
+
+@media (max-width: 480px) {
+  .titleField { padding-bottom: 38px; }
+  .settingsGroup { gap: 38px; }
+  .sectionHeading h2 { font-size: 20px; }
+  .scheduleRow { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .scheduleLabel { grid-column: 1 / -1; margin-bottom: 2px; }
+  .dateInput { grid-column: 1 / -1; }
+  .timeInput { grid-column: 1 / -1; }
+  .attendeeSettings { margin-top: 40px; }
 }
