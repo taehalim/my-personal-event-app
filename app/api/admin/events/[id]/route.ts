@@ -67,7 +67,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     description: body.description ?? existing.description,
     hostName: body.hostName ?? existing.host_name,
     coverImagePath: body.coverImagePath ?? existing.cover_image_path,
-    backgroundPreset: body.backgroundPreset ?? existing.background_preset ?? 'plain',
+    backgroundPreset: body.backgroundPreset ?? existing.background_preset ?? 'galaxy',
     startAt: body.startAt ?? existing.start_at,
     endAt: body.endAt ?? existing.end_at,
     timezone: body.timezone ?? existing.timezone,

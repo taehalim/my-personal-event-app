@@ -108,7 +108,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const locationHref = data.event.location_type === 'online' ? data.event.location_url : data.event.map_url;
   const mapEmbedUrl = getMapEmbedUrl(data.event);
   const backgroundPreset = normalizeBackgroundPreset(data.event.background_preset);
-  const isDarkCanvas = ['constellation', 'orbit', 'sparkles', 'rain', 'confetti'].includes(backgroundPreset);
+  const isDarkCanvas = backgroundPreset !== 'aurora';
 
   return <main className={`public-event-page event-theme-${backgroundPreset}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
     <EventBackground preset={backgroundPreset} />

@@ -88,13 +88,13 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const [coverPath, setCoverPath] = useState(event?.cover_image_path ?? '');
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
-  const [backgroundPreset, setBackgroundPreset] = useState<EventBackgroundPreset>(event?.background_preset ?? 'plain');
+  const [backgroundPreset, setBackgroundPreset] = useState<EventBackgroundPreset>(normalizeBackgroundPreset(event?.background_preset));
   const [sidebarPanel, setSidebarPanel] = useState<'media' | 'style' | null>(null);
   const [fieldsDraft, setFieldsDraft] = useState<DraftField[]>((fields ?? []).map(initialField));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const selectedBackground = normalizeBackgroundPreset(backgroundPreset);
-  const isDarkCanvas = ['constellation', 'orbit', 'sparkles', 'rain', 'confetti'].includes(selectedBackground);
+  const isDarkCanvas = selectedBackground !== 'aurora';
 
   useEffect(() => {
     return () => { if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl); };

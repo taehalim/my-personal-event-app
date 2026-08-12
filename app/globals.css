@@ -338,9 +338,9 @@ button, input, textarea, select { font: inherit; }
 /* The selected editor theme owns the entire browser canvas, not only the form card. */
 html:has(.editorCanvas[data-tone='dark']), body:has(.editorCanvas[data-tone='dark']) { background-color: #111216; }
 body[data-event-editor-background], body:has(.editorCanvas) { min-height: 100vh; }
-body[data-event-editor-background]:is([data-event-editor-background='constellation'], [data-event-editor-background='orbit'], [data-event-editor-background='sparkles'], [data-event-editor-background='rain'], [data-event-editor-background='confetti']) .event-create-back,
+body[data-event-editor-background]:not([data-event-editor-background='aurora']) .event-create-back,
 body:has(.editorCanvas[data-tone='dark']) .event-create-back { color: rgba(255,255,255,.72); }
-body[data-event-editor-background]:is([data-event-editor-background='constellation'], [data-event-editor-background='orbit'], [data-event-editor-background='sparkles'], [data-event-editor-background='rain'], [data-event-editor-background='confetti']) .event-editor-link,
+body[data-event-editor-background]:not([data-event-editor-background='aurora']) .event-editor-link,
 body:has(.editorCanvas[data-tone='dark']) .event-editor-link { color: rgba(255,255,255,.72); }
 
 /* Editing is a live event-page preview: the animation belongs to the viewport, never a rounded editor container. */
@@ -351,11 +351,5 @@ body:has(.editorCanvas[data-tone='dark']) .event-editor-link { color: rgba(255,2
    not remain underneath or visually turn an animated style into a static one. */
 .event-background-react-bits { background: transparent !important; filter: none !important; opacity: 1 !important; animation: none !important; }
 .event-background-react-bits::before, .event-background-react-bits::after { display: none !important; }
-body[data-event-editor-background='aurora'], body:has(.event-theme-aurora),
-body[data-event-editor-background='prism'], body:has(.event-theme-prism),
-body[data-event-editor-background='bubbles'], body:has(.event-theme-bubbles) { background: #f5f6fa !important; }
-body[data-event-editor-background='constellation'], body:has(.event-theme-constellation),
-body[data-event-editor-background='orbit'], body:has(.event-theme-orbit),
-body[data-event-editor-background='sparkles'], body:has(.event-theme-sparkles),
-body[data-event-editor-background='rain'], body:has(.event-theme-rain),
-body[data-event-editor-background='confetti'], body:has(.event-theme-confetti) { background: #0b0c11 !important; }
+body[data-event-editor-background='aurora'], body:has(.event-theme-aurora) { background: #142138 !important; }
+body[data-event-editor-background]:not([data-event-editor-background='aurora']), body:has(.event-theme-galaxy), body:has(.event-theme-balatro), body:has(.event-theme-prism), body:has(.event-theme-plasma), body:has(.event-theme-tunnel), body:has(.event-theme-warp), body:has(.event-theme-threads) { background: #090a12 !important; }

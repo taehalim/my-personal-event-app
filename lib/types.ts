@@ -1,5 +1,5 @@
 export type EventStatus = 'draft' | 'published' | 'cancelled';
-export type EventBackgroundPreset = 'plain' | 'aurora' | 'prism' | 'constellation' | 'orbit' | 'bubbles' | 'sparkles' | 'rain' | 'confetti';
+export type EventBackgroundPreset = 'galaxy' | 'balatro' | 'prism' | 'plasma' | 'tunnel' | 'warp' | 'threads' | 'aurora';
 export type ApprovalMode = 'auto' | 'manual';
 export type RegistrationStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
 export type RegistrationState = 'not_open' | 'open' | 'closed' | 'full' | 'cancelled';
