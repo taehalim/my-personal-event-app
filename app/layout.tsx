@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 
 export const metadata: Metadata = {
-  title: 'Inha의 이벤트',
+  title: 'My Personal Event App',
   description: '이벤트 생성과 참가 신청',
   icons: { icon: '/icon.svg' },
 };

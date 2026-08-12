@@ -9,7 +9,7 @@ import type { LamaEvent } from '@/lib/types';
 
 type AdminEvent = LamaEvent & { count: number };
 type Tab = 'upcoming' | 'past';
-export default function AdminEventsDirectory({ events, referenceNow }: { events: AdminEvent[]; referenceNow: string }) {
+export default function AdminEventsDirectory({ events, referenceNow, ownerName }: { events: AdminEvent[]; referenceNow: string; ownerName: string }) {
   const [tab, setTab] = useState<Tab>('upcoming');
   const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
   const visibleEvents = useMemo(() => {
@@ -31,7 +31,7 @@ export default function AdminEventsDirectory({ events, referenceNow }: { events:
 
   return <main className="events-directory admin-events-directory">
     <header className="events-directory-header admin-events-header">
-      <h1>Inha의 이벤트</h1>
+      <h1>{ownerName}의 이벤트</h1>
       <div className="event-tabs" role="tablist" aria-label="이벤트 상태">
         <button type="button" role="tab" aria-selected={tab === 'upcoming'} className={tab === 'upcoming' ? 'active' : ''} onClick={() => setTab('upcoming')}>예정된 이벤트</button>
         <button type="button" role="tab" aria-selected={tab === 'past'} className={tab === 'past' ? 'active' : ''} onClick={() => setTab('past')}>지난 이벤트</button>

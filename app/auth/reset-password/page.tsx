@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
   return <main className="auth-shell">
     <Link href="/login" className="muted">← 로그인</Link>
     <section className="auth-card">
-      <span className="admin-brand">Inha의 이벤트</span>
+      <span className="admin-brand">My Personal Event App</span>
       <h1>새 비밀번호 설정</h1>
       <p className="muted">새롭게 사용할 비밀번호를 입력해주세요.</p>
       <form onSubmit={async event => {

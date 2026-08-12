@@ -1,9 +1,47 @@
 import { NextResponse } from 'next/server';
 import { getAdmin } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { sendRegistrationEmail } from '@/lib/email';
 import { newCancelToken, tokenHash } from '@/lib/registration';
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { LamaEvent, RegistrationStatus } from '@/lib/types';
-const allowed:Record<string,string[]>={pending:['approved','rejected'],approved:['cancelled']};
-export const runtime='nodejs';
-export async function PATCH(request:Request,{params}:{params:Promise<{id:string}>}){if(!await getAdmin())return NextResponse.json({error:{code:'UNAUTHORIZED',message:'로그인이 필요합니다.'}},{status:401});const {id}=await params;const {status}=await request.json() as {status:RegistrationStatus};const admin=createAdminClient();const {data:registration}=await admin.from('registrations').select('*').eq('id',id).single();if(!registration)return NextResponse.json({error:{code:'NOT_FOUND',message:'참가자를 찾을 수 없습니다.'}},{status:404});if(!allowed[registration.status]?.includes(status))return NextResponse.json({error:{code:'INVALID_STATUS_TRANSITION',message:'허용되지 않는 상태 변경입니다.'}},{status:400});const {data:event}=await admin.from('events').select('*').eq('id',registration.event_id).single();const cancelToken=status==='approved'?newCancelToken():undefined;const {error}=await admin.from('registrations').update({status,cancelled_at:status==='cancelled'?new Date().toISOString():null,cancel_token_hash:cancelToken?tokenHash(cancelToken):registration.cancel_token_hash,updated_at:new Date().toISOString()}).eq('id',id);if(error)return NextResponse.json({error:{code:'INTERNAL_ERROR',message:error.message}},{status:500});let emailStatus='sent';try{const type=status==='approved'?'registration_approved':status==='rejected'?'registration_rejected':'registration_cancelled';await sendRegistrationEmail(type,event as LamaEvent,{name:registration.name,email:registration.email,cancelToken});}catch{emailStatus='failed';}await admin.from('email_deliveries').insert({registration_id:id,email_type:status==='approved'?'registration_approved':status==='rejected'?'registration_rejected':'registration_cancelled',attempt_no:1,to_email:registration.email,status:emailStatus,sent_at:emailStatus==='sent'?new Date().toISOString():null});return NextResponse.json({registrationId:id,status,emailStatus});}
+
+const allowed: Record<string, RegistrationStatus[]> = {
+  pending: ['approved', 'rejected'],
+  approved: ['cancelled'],
+};
+
+export const runtime = 'nodejs';
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getAdmin();
+  if (!user) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
+
+  const { id } = await params;
+  const { status } = await request.json() as { status: RegistrationStatus };
+  const admin = createAdminClient();
+  const { data: registration } = await admin.from('registrations').select('*').eq('id', id).maybeSingle();
+  if (!registration) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '참가자를 찾을 수 없습니다.' } }, { status: 404 });
+
+  const { data: event } = await admin.from('events').select('*').eq('id', registration.event_id).eq('created_by', user.id).maybeSingle();
+  if (!event) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
+  if (!allowed[registration.status]?.includes(status)) return NextResponse.json({ error: { code: 'INVALID_STATUS_TRANSITION', message: '허용되지 않는 상태 변경입니다.' } }, { status: 400 });
+
+  const cancelToken = status === 'approved' ? newCancelToken() : undefined;
+  const { error } = await admin.from('registrations').update({
+    status,
+    cancelled_at: status === 'cancelled' ? new Date().toISOString() : null,
+    cancel_token_hash: cancelToken ? tokenHash(cancelToken) : registration.cancel_token_hash,
+    updated_at: new Date().toISOString(),
+  }).eq('id', id);
+  if (error) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error.message } }, { status: 500 });
+
+  const emailType = status === 'approved' ? 'registration_approved' : status === 'rejected' ? 'registration_rejected' : 'registration_cancelled';
+  let emailStatus = 'sent';
+  try {
+    await sendRegistrationEmail(emailType, event as LamaEvent, { name: registration.name, email: registration.email, cancelToken });
+  } catch {
+    emailStatus = 'failed';
+  }
+  await admin.from('email_deliveries').insert({ registration_id: id, email_type: emailType, attempt_no: 1, to_email: registration.email, status: emailStatus, sent_at: emailStatus === 'sent' ? new Date().toISOString() : null });
+  return NextResponse.json({ registrationId: id, status, emailStatus });
+}

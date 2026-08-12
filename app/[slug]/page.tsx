@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import { ArrowLeft, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Clock3, ExternalLink, Globe2, MapPin, UsersRound, Video } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -14,8 +14,9 @@ import { appUrl, publicCoverUrl } from '@/lib/formatting';
 import type { LamaEvent, RegistrationField } from '@/lib/types';
 import RegistrationDrawer from '@/components/RegistrationDrawer';
 import EventBackground from '@/components/EventBackground';
+import EventCanvasFrame from '@/components/EventCanvasFrame';
 import EventExperienceLayout from '@/components/EventExperienceLayout';
-import { normalizeBackgroundPreset } from '@/lib/event-backgrounds';
+import { isDarkEventBackground, normalizeBackgroundPreset } from '@/lib/event-backgrounds';
 
 async function getEvent(slug: string) {
   const supabase = await createClient();
@@ -108,14 +109,13 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const locationHref = data.event.location_type === 'online' ? data.event.location_url : data.event.map_url;
   const mapEmbedUrl = getMapEmbedUrl(data.event);
   const backgroundPreset = normalizeBackgroundPreset(data.event.background_preset);
-  const isDarkCanvas = backgroundPreset !== 'aurora';
+  const isDarkCanvas = isDarkEventBackground(backgroundPreset);
 
   return <main className={`public-event-page event-theme-${backgroundPreset}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
-    <EventBackground preset={backgroundPreset} />
+    <EventBackground preset={backgroundPreset} fullViewport />
     <div className="public-event-container">
-      <Link href="/" className="public-event-back"><ArrowLeft size={17} strokeWidth={1.8} /><span>Inha의 이벤트</span></Link>
-
-      <EventExperienceLayout className="public-event-layout" aside={<div className="public-event-sidebar">
+      <EventCanvasFrame header={<Link href="/" className="public-event-back"><ArrowLeft size={17} strokeWidth={1.8} /><span>{data.event.host_name}의 이벤트</span></Link>}>
+        <EventExperienceLayout className="public-event-layout" aside={<div className="public-event-sidebar">
           <div className="public-event-sidebar-sticky">
             <div className="public-event-cover">
               {cover ? <Image src={cover} alt="" fill priority sizes="(max-width: 720px) 100vw, 380px" /> : <span aria-hidden="true">I</span>}
@@ -147,34 +147,44 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             <h1>{data.event.title}</h1>
           </header>
 
-          <section className="public-event-facts" aria-label="이벤트 일정과 장소">
-            <div className="public-event-fact public-event-date-fact">
-              <span className="public-event-fact-icon"><CalendarDays size={21} strokeWidth={1.7} /></span>
-              <div><strong>{date.dateLabel}</strong><span><Clock3 size={15} strokeWidth={1.8} />{date.timeLabel}</span></div>
-            </div>
-            <div className="public-event-fact">
-              <span className="public-event-fact-icon">{data.event.location_type === 'online' ? <Globe2 size={21} strokeWidth={1.7} /> : <MapPin size={21} strokeWidth={1.7} />}</span>
-              <div><strong>{location.title}</strong>{location.detail && <span>{location.detail}</span>}{locationHref && <a href={locationHref} target="_blank" rel="noreferrer">{data.event.location_type === 'online' ? '온라인 링크 열기' : '지도에서 보기'} <ExternalLink size={13} strokeWidth={1.8} /></a>}</div>
+          <section className="public-event-schedule" aria-labelledby="schedule-heading">
+            <header className="public-event-section-heading"><h2 id="schedule-heading">일정</h2></header>
+            <div className="public-event-facts">
+              <div className="public-event-fact public-event-date-fact">
+                <span className="public-event-fact-icon"><CalendarDays size={21} strokeWidth={1.7} /></span>
+                <div><strong>{date.dateLabel}</strong><span><Clock3 size={15} strokeWidth={1.8} />{date.timeLabel}</span></div>
+              </div>
             </div>
           </section>
 
+          <section className="public-event-directions" aria-labelledby="directions-heading">
+            <header className="public-event-section-heading public-event-directions-header">
+              <h2 id="directions-heading">{data.event.location_type === 'online' ? '참여 방법' : '오시는 길'}</h2>
+              {locationHref && <a className="public-event-directions-link" href={locationHref} target="_blank" rel="noreferrer">{data.event.location_type === 'online' ? '참여 링크 열기' : '길찾기'} <ExternalLink size={14} strokeWidth={1.8} /></a>}
+            </header>
+            <div className="public-event-fact public-event-directions-fact">
+              <span className="public-event-fact-icon">{data.event.location_type === 'online' ? <Globe2 size={21} strokeWidth={1.7} /> : <MapPin size={21} strokeWidth={1.7} />}</span>
+              <div><strong>{location.title}</strong>{location.detail && <span>{location.detail}</span>}</div>
+            </div>
+            {mapEmbedUrl && <div className="public-event-map"><iframe title={`${location.title} 지도`} src={mapEmbedUrl} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div>}
+            {data.event.location_type === 'online' && locationHref && <a className="public-event-online-join" href={locationHref} target="_blank" rel="noreferrer">
+              <span className="public-event-online-join-icon" aria-hidden="true"><Video size={20} strokeWidth={1.8} /></span>
+              <span><strong>온라인으로 참여하기</strong><small>이벤트가 시작되면 참여 링크에서 만나요.</small></span>
+              <ExternalLink size={17} strokeWidth={1.8} aria-hidden="true" />
+            </a>}
+          </section>
+
           <section className="public-event-about">
-            <h2>이벤트 소개</h2>
+            <header className="public-event-section-heading"><h2>이벤트 소개</h2></header>
             <div className="public-event-description"><ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeSanitize]} components={{ img: ({ alt: _alt, ...props }) => {
               // Markdown image URLs are user content, so keep the native image element and suppress broken alt copy.
               // eslint-disable-next-line @next/next/no-img-element
               return <img {...props} alt="" loading="lazy" />;
             } }}>{cleanDescription(data.event.description)}</ReactMarkdown></div>
           </section>
-
-          {mapEmbedUrl && <section className="public-event-location">
-            <h2>위치</h2>
-            <div className="public-event-location-heading"><MapPin size={18} strokeWidth={1.8} /><strong>{location.title}</strong>{location.detail && <span>{location.detail}</span>}</div>
-            <div className="public-event-map"><iframe title="이벤트 장소 지도" src={mapEmbedUrl} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div>
-            {locationHref && <a className="public-event-map-link" href={locationHref} target="_blank" rel="noreferrer">Google Maps에서 보기 <ExternalLink size={13} strokeWidth={1.8} /></a>}
-          </section>}
         </article>
-      </EventExperienceLayout>
+        </EventExperienceLayout>
+      </EventCanvasFrame>
     </div>
   </main>;
 }

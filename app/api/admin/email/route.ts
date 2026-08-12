@@ -1,8 +1,41 @@
 import { NextResponse } from 'next/server';
 import { getAdmin } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { sendRegistrationEmail } from '@/lib/email';
-import type { LamaEvent } from '@/lib/types';
 import { newCancelToken, tokenHash } from '@/lib/registration';
-export const runtime='nodejs';
-export async function POST(request:Request){if(!await getAdmin())return NextResponse.json({error:{code:'UNAUTHORIZED',message:'로그인이 필요합니다.'}},{status:401});const {registrationId,emailType}=await request.json();const valid=['registration_approved','registration_pending','registration_rejected','registration_cancelled'];if(!valid.includes(emailType))return NextResponse.json({error:{code:'INVALID_INPUT',message:'이메일 종류가 올바르지 않습니다.'}},{status:400});const admin=createAdminClient();const {data:registration}=await admin.from('registrations').select('*').eq('id',registrationId).single();if(!registration)return NextResponse.json({error:{code:'NOT_FOUND',message:'대상을 찾을 수 없습니다.'}},{status:404});const [{data:event},{data:previous}]=await Promise.all([admin.from('events').select('*').eq('id',registration.event_id).single(),admin.from('email_deliveries').select('attempt_no').eq('registration_id',registrationId).eq('email_type',emailType).order('attempt_no',{ascending:false}).limit(1)]);if(!event)return NextResponse.json({error:{code:'NOT_FOUND',message:'행사를 찾을 수 없습니다.'}},{status:404});const attemptNo=(previous?.[0]?.attempt_no??0)+1;const cancelToken=['registration_approved','registration_pending'].includes(emailType)?newCancelToken():undefined;if(cancelToken)await admin.from('registrations').update({cancel_token_hash:tokenHash(cancelToken)}).eq('id',registrationId);let status='sent';let errorMessage:string|null=null;try{await sendRegistrationEmail(emailType,event as LamaEvent,{name:registration.name,email:registration.email,cancelToken});}catch(error){status='failed';errorMessage=error instanceof Error?error.message:'발송 실패';}const {data:delivery,error}=await admin.from('email_deliveries').insert({registration_id:registrationId,email_type:emailType,attempt_no:attemptNo,to_email:registration.email,status,sent_at:status==='sent'?new Date().toISOString():null,error_message:errorMessage}).select().single();if(error)return NextResponse.json({error:{code:'INTERNAL_ERROR',message:error.message}},{status:500});return NextResponse.json({deliveryId:delivery.id,status,attemptNo,errorMessage},{status:201});}
+import { createAdminClient } from '@/lib/supabase/admin';
+import type { LamaEvent } from '@/lib/types';
+
+const emailTypes = ['registration_approved', 'registration_pending', 'registration_rejected', 'registration_cancelled'] as const;
+
+export const runtime = 'nodejs';
+
+export async function POST(request: Request) {
+  const user = await getAdmin();
+  if (!user) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
+
+  const { registrationId, emailType } = await request.json() as { registrationId?: string; emailType?: typeof emailTypes[number] };
+  if (!registrationId || !emailType || !emailTypes.includes(emailType)) return NextResponse.json({ error: { code: 'INVALID_INPUT', message: '이메일 종류가 올바르지 않습니다.' } }, { status: 400 });
+
+  const admin = createAdminClient();
+  const { data: registration } = await admin.from('registrations').select('*').eq('id', registrationId).maybeSingle();
+  if (!registration) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '대상을 찾을 수 없습니다.' } }, { status: 404 });
+  const { data: event } = await admin.from('events').select('*').eq('id', registration.event_id).eq('created_by', user.id).maybeSingle();
+  if (!event) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
+
+  const { data: previous } = await admin.from('email_deliveries').select('attempt_no').eq('registration_id', registrationId).eq('email_type', emailType).order('attempt_no', { ascending: false }).limit(1);
+  const attemptNo = (previous?.[0]?.attempt_no ?? 0) + 1;
+  const cancelToken = ['registration_approved', 'registration_pending'].includes(emailType) ? newCancelToken() : undefined;
+  if (cancelToken) await admin.from('registrations').update({ cancel_token_hash: tokenHash(cancelToken) }).eq('id', registrationId);
+
+  let status = 'sent';
+  let errorMessage: string | null = null;
+  try {
+    await sendRegistrationEmail(emailType, event as LamaEvent, { name: registration.name, email: registration.email, cancelToken });
+  } catch (error) {
+    status = 'failed';
+    errorMessage = error instanceof Error ? error.message : '발송 실패';
+  }
+  const { data: delivery, error } = await admin.from('email_deliveries').insert({ registration_id: registrationId, email_type: emailType, attempt_no: attemptNo, to_email: registration.email, status, sent_at: status === 'sent' ? new Date().toISOString() : null, error_message: errorMessage }).select().single();
+  if (error) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error.message } }, { status: 500 });
+  return NextResponse.json({ deliveryId: delivery.id, status, attemptNo, errorMessage }, { status: 201 });
+}

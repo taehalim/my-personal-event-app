@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { displayNameForUser } from '@/lib/profile';
 
 export async function getAdmin() {
   const supabase = await createClient();
@@ -10,3 +11,8 @@ export async function getAdmin() {
 }
 
 export async function requireAdmin() { const user = await getAdmin(); if (!user) redirect('/login'); return user; }
+
+export async function requireAdminProfile() {
+  const user = await requireAdmin();
+  return { user, displayName: displayNameForUser(user) };
+}

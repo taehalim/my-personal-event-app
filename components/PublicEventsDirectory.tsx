@@ -7,7 +7,7 @@ import { groupEventsByDate } from '@/lib/event-directory';
 import type { LamaEvent } from '@/lib/types';
 
 type Tab = 'upcoming' | 'past';
-export default function PublicEventsDirectory({ events, referenceNow }: { events: LamaEvent[]; referenceNow: string }) {
+export default function PublicEventsDirectory({ events, referenceNow, ownerName }: { events: LamaEvent[]; referenceNow: string; ownerName: string }) {
   const [tab, setTab] = useState<Tab>('upcoming');
   const visibleEvents = useMemo(() => {
     const now = new Date(referenceNow);
@@ -17,7 +17,7 @@ export default function PublicEventsDirectory({ events, referenceNow }: { events
 
   return <main className="events-directory">
     <header className="events-directory-header">
-      <h1>Inha의 이벤트</h1>
+      <h1>{ownerName}의 이벤트</h1>
       <div className="event-tabs" role="tablist" aria-label="이벤트 상태">
         <button type="button" role="tab" aria-selected={tab === 'upcoming'} className={tab === 'upcoming' ? 'active' : ''} onClick={() => setTab('upcoming')}>예정된 이벤트</button>
         <button type="button" role="tab" aria-selected={tab === 'past'} className={tab === 'past' ? 'active' : ''} onClick={() => setTab('past')}>지난 이벤트</button>

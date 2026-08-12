@@ -1,13 +1,13 @@
-import { requireAdmin } from '@/lib/auth';
+import { requireAdminProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import AdminEventsDirectory from '@/components/AdminEventsDirectory';
 import type { LamaEvent } from '@/lib/types';
 
 export default async function AdminPage() {
-  await requireAdmin();
   const supabase = await createClient();
-  const { data: events } = await supabase.from('events').select('*').order('start_at', { ascending: true });
+  const { user, displayName } = await requireAdminProfile();
+  const { data: events } = await supabase.from('events').select('*').eq('created_by', user.id).order('start_at', { ascending: true });
   const eventIds = (events ?? []).map(event => event.id);
   const admin = createAdminClient();
   const { data: registrations } = eventIds.length ? await admin.from('registrations').select('event_id').in('event_id', eventIds).eq('status', 'approved') : { data: [] };
@@ -16,5 +16,5 @@ export default async function AdminPage() {
     return result;
   }, new Map<string, number>());
   const enriched = (events ?? []).map(event => ({ ...(event as LamaEvent), count: counts.get(event.id) ?? 0 }));
-  return <AdminEventsDirectory events={enriched} referenceNow={new Date().toISOString()} />;
+  return <AdminEventsDirectory events={enriched} referenceNow={new Date().toISOString()} ownerName={displayName} />;
 }

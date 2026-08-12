@@ -1,5 +1,5 @@
 export type EventStatus = 'draft' | 'published' | 'cancelled';
-export type EventBackgroundPreset = 'galaxy' | 'balatro' | 'prism' | 'plasma' | 'tunnel' | 'warp' | 'threads' | 'aurora';
+export type EventBackgroundPreset = 'galaxy' | 'balatro' | 'prism' | 'plasma' | 'tunnel' | 'warp' | 'threads' | 'aurora' | 'midnight' | 'paper';
 export type ApprovalMode = 'auto' | 'manual';
 export type RegistrationStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
 export type RegistrationState = 'not_open' | 'open' | 'closed' | 'full' | 'cancelled';

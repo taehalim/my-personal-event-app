@@ -7,13 +7,13 @@ import { eventSchema } from '@/lib/validations';
 
 const storedCoverPath = z.string().regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.webp$/i);
 
-function toEventRow(value: ReturnType<typeof eventSchema.parse>) {
+function toEventRow(value: ReturnType<typeof eventSchema.parse>, hostName: string) {
   return {
     title: value.title,
     description: value.description,
     cover_image_path: value.coverImagePath ?? null,
     background_preset: value.backgroundPreset,
-    host_name: value.hostName,
+    host_name: hostName,
     start_at: value.startAt,
     end_at: value.endAt,
     timezone: value.timezone,
@@ -37,11 +37,12 @@ async function removeStoredCover(path: string | null) {
 }
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!await getAdmin()) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
+  const user = await getAdmin();
+  if (!user) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
   const { id } = await params;
   const supabase = await createClient();
   const [{ data: event, error }, { data: fields }] = await Promise.all([
-    supabase.from('events').select('*').eq('id', id).single(),
+    supabase.from('events').select('*').eq('id', id).eq('created_by', user.id).single(),
     supabase.from('registration_fields').select('*').eq('event_id', id).order('sort_order'),
   ]);
   if (error || !event) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
@@ -55,17 +56,20 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!await getAdmin()) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
+  const user = await getAdmin();
+  if (!user) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
   const { id } = await params;
   const supabase = await createClient();
-  const { data: existing } = await supabase.from('events').select('*').eq('id', id).single();
+  const { data: existing } = await supabase.from('events').select('*').eq('id', id).eq('created_by', user.id).single();
   if (!existing) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
 
   const body = await request.json();
   const parsed = eventSchema.safeParse({
     title: body.title ?? existing.title,
     description: body.description ?? existing.description,
-    hostName: body.hostName ?? existing.host_name,
+    // The host identity belongs to the signed-in account, not to the browser
+    // payload. Existing events retain their recorded host name.
+    hostName: existing.host_name,
     coverImagePath: body.coverImagePath ?? existing.cover_image_path,
     backgroundPreset: body.backgroundPreset ?? existing.background_preset ?? 'galaxy',
     startAt: body.startAt ?? existing.start_at,
@@ -85,7 +89,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   });
   if (!parsed.success) return NextResponse.json({ error: { code: 'INVALID_INPUT', message: parsed.error.issues[0]?.message ?? '입력값을 확인해주세요.' } }, { status: 400 });
 
-  const { data: event, error } = await supabase.from('events').update(toEventRow(parsed.data)).eq('id', id).select().single();
+  const { data: event, error } = await supabase.from('events').update(toEventRow(parsed.data, existing.host_name)).eq('id', id).eq('created_by', user.id).select().single();
   if (error || !event) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error?.message ?? '이벤트를 저장하지 못했습니다.' } }, { status: 500 });
 
   if (body.fields !== undefined) {
@@ -111,12 +115,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!await getAdmin()) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
+  const user = await getAdmin();
+  if (!user) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
   const { id } = await params;
   const supabase = await createClient();
-  const { data: existing } = await supabase.from('events').select('cover_image_path').eq('id', id).maybeSingle();
+  const { data: existing } = await supabase.from('events').select('cover_image_path').eq('id', id).eq('created_by', user.id).maybeSingle();
   if (!existing) return NextResponse.json({ error: { code: 'NOT_FOUND', message: '이벤트를 찾을 수 없습니다.' } }, { status: 404 });
-  const { error } = await supabase.from('events').delete().eq('id', id);
+  const { error } = await supabase.from('events').delete().eq('id', id).eq('created_by', user.id);
   if (error) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error.message } }, { status: 500 });
   await removeStoredCover(existing.cover_image_path);
   return new NextResponse(null, { status: 204 });

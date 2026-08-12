@@ -11,6 +11,7 @@ function callbackUrl(next: string) {
 }
 
 export default function SignUpForm() {
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -22,11 +23,12 @@ export default function SignUpForm() {
     event.preventDefault();
     setError('');
     setMessage('');
+    if (!displayName.trim()) { setError('이름을 입력해 주세요.'); return; }
     if (password.length < 6) { setError('비밀번호는 6자 이상이어야 합니다.'); return; }
     if (password !== passwordConfirm) { setError('비밀번호가 일치하지 않습니다.'); return; }
 
     setLoading(true);
-    const { data, error: signUpError } = await createClient().auth.signUp({ email, password, options: { emailRedirectTo: callbackUrl('/login') } });
+    const { data, error: signUpError } = await createClient().auth.signUp({ email, password, options: { data: { display_name: displayName.trim() }, emailRedirectTo: callbackUrl('/login') } });
     if (signUpError) {
       setError(signUpError.message.toLowerCase().includes('already') ? '이미 가입된 이메일입니다.' : '회원가입을 완료하지 못했습니다. 입력 내용을 확인해주세요.');
     } else if (data.session) {
@@ -36,6 +38,7 @@ export default function SignUpForm() {
     }
     setLoading(false);
   }} className="auth-form">
+    <div className="field"><label htmlFor="signup-name">이름</label><input id="signup-name" type="text" autoComplete="name" maxLength={80} required value={displayName} onChange={event => setDisplayName(event.target.value)} placeholder="예: 태하" /><span className="field-hint">이벤트 주최자와 이벤트 목록 제목에 사용됩니다.</span></div>
     <div className="field"><label htmlFor="signup-email">이메일</label><input id="signup-email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} /></div>
     <div className="field"><label htmlFor="signup-password">비밀번호</label><input id="signup-password" type="password" autoComplete="new-password" minLength={6} required value={password} onChange={event => setPassword(event.target.value)} /><span className="field-hint">6자 이상 입력해주세요.</span></div>
     <div className="field"><label htmlFor="signup-password-confirm">비밀번호 확인</label><input id="signup-password-confirm" type="password" autoComplete="new-password" minLength={6} required value={passwordConfirm} onChange={event => setPasswordConfirm(event.target.value)} /></div>

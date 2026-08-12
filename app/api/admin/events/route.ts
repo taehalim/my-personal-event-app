@@ -1,18 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getAdmin } from '@/lib/auth';
+import { displayNameForUser } from '@/lib/profile';
 import { makeSlug } from '@/lib/slug';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { eventSchema } from '@/lib/validations';
 
-function toEventRow(value: ReturnType<typeof eventSchema.parse>, userId: string, slug: string) {
+function toEventRow(value: ReturnType<typeof eventSchema.parse>, userId: string, slug: string, hostName: string) {
   return {
     slug,
     title: value.title,
     description: value.description,
     cover_image_path: value.coverImagePath ?? null,
     background_preset: value.backgroundPreset ?? 'galaxy',
-    host_name: value.hostName,
+    host_name: hostName,
     start_at: value.startAt,
     end_at: value.endAt,
     timezone: value.timezone,
@@ -47,13 +48,14 @@ async function approvedCountByEvent(eventIds: string[]) {
 }
 
 export async function GET(request: Request) {
-  if (!await getAdmin()) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
+  const user = await getAdmin();
+  if (!user) return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } }, { status: 401 });
 
   const url = new URL(request.url);
   const status = url.searchParams.get('status') ?? 'all';
   const queryText = url.searchParams.get('q') ?? '';
   const supabase = await createClient();
-  let query = supabase.from('events').select('*').order('start_at', { ascending: false });
+  let query = supabase.from('events').select('*').eq('created_by', user.id).order('start_at', { ascending: false });
   if (status !== 'all') query = query.eq('status', status);
   if (queryText) query = query.ilike('title', `%${queryText}%`);
 
@@ -83,7 +85,7 @@ export async function POST(request: Request) {
     slug = makeSlug();
   }
 
-  const { data: event, error } = await supabase.from('events').insert(toEventRow(parsed.data, user.id, slug)).select().single();
+  const { data: event, error } = await supabase.from('events').insert(toEventRow(parsed.data, user.id, slug, displayNameForUser(user))).select().single();
   if (error || !event) return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: error?.message ?? '이벤트를 생성하지 못했습니다.' } }, { status: 500 });
 
   if (parsed.data.fields?.length) {

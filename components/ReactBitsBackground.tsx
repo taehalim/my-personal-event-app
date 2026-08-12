@@ -32,5 +32,7 @@ export default function ReactBitsBackground({ preset }: { preset: EventBackgroun
       return <Threads color={[0.46, 0.65, 1]} amplitude={1.45} distance={0.15} enableMouseInteraction />;
     case 'aurora':
       return <Aurora colorStops={['#8ec5ff', '#eab8ff', '#8ce5cd']} amplitude={1.05} blend={0.52} speed={0.72} />;
+    default:
+      return null;
   }
 }

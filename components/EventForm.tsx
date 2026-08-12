@@ -7,17 +7,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { addHours, format, parseISO } from 'date-fns';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
-import ReactMarkdown from 'react-markdown';
-import rehypeSanitize from 'rehype-sanitize';
-import remarkBreaks from 'remark-breaks';
-import remarkGfm from 'remark-gfm';
 import { CalendarDays, Check, Clock3, FileText, Globe2, ImagePlus, Images, MapPin, Sparkles, UsersRound, Video } from 'lucide-react';
 import type { FieldType, LamaEvent, RegistrationField } from '@/lib/types';
 import { publicCoverUrl } from '@/lib/formatting';
-import { EVENT_BACKGROUND_PRESETS, normalizeBackgroundPreset, type EventBackgroundPreset } from '@/lib/event-backgrounds';
+import { EVENT_BACKGROUND_PRESETS, isDarkEventBackground, normalizeBackgroundPreset, type EventBackgroundPreset } from '@/lib/event-backgrounds';
 import { EVENT_COVER_LIBRARY } from '@/lib/cover-library';
 import EventBackground from '@/components/EventBackground';
+import EventCanvasFrame from '@/components/EventCanvasFrame';
 import EventExperienceLayout from '@/components/EventExperienceLayout';
+import DeleteEventButton from '@/components/DeleteEventButton';
+import MarkdownEditor from '@/components/MarkdownEditor';
 import styles from './EventForm.module.css';
 
 type ExistingField = RegistrationField & { sort_order?: number; sortOrder?: number };
@@ -68,12 +67,11 @@ function initialField(field: ExistingField): DraftField {
   return { type: field.type, label: field.label, description: field.description ?? '', placeholder: field.placeholder ?? '', required: field.required, optionsText: (field.options ?? []).map(option => `${option.label}:${option.value}`).join(', ') };
 }
 
-export default function EventForm({ event, fields }: { event?: LamaEvent; fields?: ExistingField[] }) {
+export default function EventForm({ event, fields, hostName: suppliedHostName }: { event?: LamaEvent; fields?: ExistingField[]; hostName?: string }) {
   const router = useRouter();
   const [title, setTitle] = useState(event?.title ?? '');
   const [description, setDescription] = useState(event?.description ?? '');
-  const [descriptionMode, setDescriptionMode] = useState<'write' | 'preview'>('write');
-  const [hostName] = useState(event?.host_name ?? 'Inha');
+  const [hostName] = useState(event?.host_name ?? suppliedHostName ?? '나');
   const [startAt, setStartAt] = useState(dateTimeValue(event?.start_at));
   const [endAt, setEndAt] = useState(dateTimeValue(event?.end_at));
   const [registrationOpenAt, setRegistrationOpenAt] = useState(dateTimeValue(event?.registration_open_at));
@@ -94,7 +92,7 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const selectedBackground = normalizeBackgroundPreset(backgroundPreset);
-  const isDarkCanvas = selectedBackground !== 'aurora';
+  const isDarkCanvas = isDarkEventBackground(selectedBackground);
 
   useEffect(() => {
     return () => { if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl); };
@@ -103,11 +101,13 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
   useEffect(() => {
     document.documentElement.dataset.eventEditorBackground = selectedBackground;
     document.body.dataset.eventEditorBackground = selectedBackground;
+    document.body.dataset.eventEditorTone = isDarkCanvas ? 'dark' : 'light';
     return () => {
       delete document.documentElement.dataset.eventEditorBackground;
       delete document.body.dataset.eventEditorBackground;
+      delete document.body.dataset.eventEditorTone;
     };
-  }, [selectedBackground]);
+  }, [isDarkCanvas, selectedBackground]);
 
   const coverPreview = coverPreviewUrl ?? publicCoverUrl(coverPath);
   const chosenLocation = locationType === 'in_person' ? locationName : locationUrl;
@@ -195,8 +195,16 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
 
   return <div className={`${styles.editorCanvas} event-theme-${selectedBackground}`} data-tone={isDarkCanvas ? 'dark' : 'light'}>
     <EventBackground preset={selectedBackground} fullViewport />
-    <form onSubmit={save} className={styles.form}>
-    <EventExperienceLayout className={styles.workspace} aside={<div className={styles.sidebar}>
+    <EventCanvasFrame header={<>
+      <Link href="/admin" className="event-create-back">← {hostName}의 이벤트</Link>
+      {event && <div className="event-editor-actions">
+        <a href={`/${event.slug}`} target="_blank" rel="noreferrer" className="event-editor-link">공개 링크 보기 ↗</a>
+        <Link href={`/admin/events/${event.id}/registrations`} className="event-editor-link">참가자 관리</Link>
+        <DeleteEventButton id={event.id} />
+      </div>}
+    </>}>
+      <form onSubmit={save} className={styles.form}>
+      <EventExperienceLayout className={styles.workspace} aside={<div className={styles.sidebar}>
         <div className={styles.preview} aria-label="공개 페이지 미리보기">
           <div className={styles.previewContent}>
             <div className={styles.coverPreview}>{coverPreviewUrl ? <>
@@ -244,39 +252,46 @@ export default function EventForm({ event, fields }: { event?: LamaEvent; fields
 
         <div className={styles.titleField}><label htmlFor="event-title">이벤트 제목</label><input id="event-title" required maxLength={120} value={title} onChange={inputEvent => setTitle(inputEvent.target.value)} placeholder="이벤트 제목" /></div>
 
-        <section className={styles.panel} aria-labelledby="schedule-heading">
-          <div className={styles.panelHeading}><div><CalendarDays size={18} strokeWidth={1.8} /><strong id="schedule-heading">일정</strong></div><span><Globe2 size={14} strokeWidth={1.8} />Asia/Seoul</span></div>
-          <div className={styles.scheduleList}><DateTimeControl id="event-start" label="시작" value={startAt} onChange={changeStartAt} /><DateTimeControl id="event-end" label="종료" value={endAt} onChange={setEndAt} /></div>
+        <section className={styles.settingsGroup} aria-labelledby="required-settings-heading">
+          <div className={styles.settingsGroupHeading}><strong id="required-settings-heading">필수 이벤트 설정</strong><span>참가자에게 보여질 기본 정보</span></div>
+          <section className={styles.panel} aria-labelledby="schedule-heading">
+            <div className={styles.panelHeading}><div><CalendarDays size={18} strokeWidth={1.8} /><strong id="schedule-heading">일정</strong></div><span><Globe2 size={14} strokeWidth={1.8} />Asia/Seoul</span></div>
+            <div className={styles.scheduleList}><DateTimeControl id="event-start" label="시작" value={startAt} onChange={changeStartAt} /><DateTimeControl id="event-end" label="종료" value={endAt} onChange={setEndAt} /></div>
+          </section>
+
+          <section className={styles.panel} aria-labelledby="location-heading">
+            <div className={styles.panelHeading}><div><MapPin size={18} strokeWidth={1.8} /><strong id="location-heading">장소</strong></div></div>
+            <div className={styles.locationTabs} role="tablist" aria-label="장소 유형"><button type="button" className={locationType === 'in_person' ? styles.active : ''} onClick={() => setLocationType('in_person')} role="tab" aria-selected={locationType === 'in_person'}><MapPin size={16} />오프라인</button><button type="button" className={locationType === 'online' ? styles.active : ''} onClick={() => setLocationType('online')} role="tab" aria-selected={locationType === 'online'}><Video size={16} />온라인</button></div>
+            <label className={styles.locationInput}>{locationType === 'in_person' ? <MapPin size={18} strokeWidth={1.8} aria-hidden="true" /> : <Globe2 size={18} strokeWidth={1.8} aria-hidden="true" />}<span className="sr-only">{locationType === 'in_person' ? '장소 이름' : '온라인 링크'}</span><input type={locationType === 'in_person' ? 'text' : 'url'} value={chosenLocation} onChange={inputEvent => locationType === 'in_person' ? setLocationName(inputEvent.target.value) : setLocationUrl(inputEvent.target.value)} placeholder={locationType === 'in_person' ? '예: 인하대학교 60주년기념관' : 'https://meet.google.com/...'} /></label>
+            {locationType === 'in_person' && locationName.trim() && <div className={styles.mapPreview}><iframe title="이벤트 장소 지도" src={googleMapsEmbedUrl(locationName)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><a href={googleMapsSearchUrl(locationName)} target="_blank" rel="noreferrer">Google Maps에서 보기 ↗</a></div>}
+          </section>
+
+          <section className={styles.panel} aria-labelledby="description-heading">
+            <div className={styles.panelHeading}><div><FileText size={18} strokeWidth={1.8} /><strong id="description-heading">이벤트 소개</strong></div><span>입력 즉시 서식 반영</span></div>
+            <MarkdownEditor value={description} onChange={setDescription} className={styles.markdownEditor} contentEditableClassName={styles.markdownEditorContent} />
+          </section>
         </section>
 
-        <section className={styles.panel} aria-labelledby="location-heading">
-          <div className={styles.panelHeading}><div><MapPin size={18} strokeWidth={1.8} /><strong id="location-heading">장소</strong></div></div>
-          <div className={styles.locationTabs} role="tablist" aria-label="장소 유형"><button type="button" className={locationType === 'in_person' ? styles.active : ''} onClick={() => setLocationType('in_person')} role="tab" aria-selected={locationType === 'in_person'}><MapPin size={16} />오프라인</button><button type="button" className={locationType === 'online' ? styles.active : ''} onClick={() => setLocationType('online')} role="tab" aria-selected={locationType === 'online'}><Video size={16} />온라인</button></div>
-          <label className={styles.locationInput}>{locationType === 'in_person' ? <MapPin size={18} strokeWidth={1.8} aria-hidden="true" /> : <Globe2 size={18} strokeWidth={1.8} aria-hidden="true" />}<span className="sr-only">{locationType === 'in_person' ? '장소 이름' : '온라인 링크'}</span><input type={locationType === 'in_person' ? 'text' : 'url'} value={chosenLocation} onChange={inputEvent => locationType === 'in_person' ? setLocationName(inputEvent.target.value) : setLocationUrl(inputEvent.target.value)} placeholder={locationType === 'in_person' ? '예: 인하대학교 60주년기념관' : 'https://meet.google.com/...'} /></label>
-          {locationType === 'in_person' && locationName.trim() && <div className={styles.mapPreview}><iframe title="이벤트 장소 지도" src={googleMapsEmbedUrl(locationName)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><a href={googleMapsSearchUrl(locationName)} target="_blank" rel="noreferrer">Google Maps에서 보기 ↗</a></div>}
-        </section>
-
-        <section className={styles.panel} aria-labelledby="description-heading">
-          <div className={styles.panelHeading}><div><FileText size={18} strokeWidth={1.8} /><strong id="description-heading">이벤트 소개</strong></div><div className={styles.editorTabs} role="tablist" aria-label="이벤트 소개 편집 방식"><button type="button" className={descriptionMode === 'write' ? styles.active : ''} onClick={() => setDescriptionMode('write')} role="tab" aria-selected={descriptionMode === 'write'}>작성</button><button type="button" className={descriptionMode === 'preview' ? styles.active : ''} onClick={() => setDescriptionMode('preview')} role="tab" aria-selected={descriptionMode === 'preview'}>미리보기</button></div></div>
-          {descriptionMode === 'write' ? <textarea id="event-description" required value={description} onChange={inputEvent => setDescription(inputEvent.target.value)} placeholder="이벤트에서 다룰 내용과 참가자에게 필요한 안내를 적어 주세요. Markdown을 지원합니다." /> : <div className={styles.markdownPreview}>{description.trim() ? <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeSanitize]}>{description}</ReactMarkdown> : <p>작성한 이벤트 소개가 여기에 표시됩니다.</p>}</div>}
-        </section>
-
-        <section className={styles.panel} aria-labelledby="registration-heading">
-          <div className={styles.panelHeading}><div><UsersRound size={18} strokeWidth={1.8} /><strong id="registration-heading">참가 설정</strong></div><span>선택 사항</span></div>
+        <section className={styles.settingsGroup} aria-labelledby="optional-settings-heading">
+          <div className={styles.settingsGroupHeading}><strong id="optional-settings-heading">선택 이벤트 설정</strong><span>참가 방식과 신청 항목</span></div>
+          <section className={styles.panel} aria-labelledby="registration-heading">
+            <div className={styles.panelHeading}><div><UsersRound size={18} strokeWidth={1.8} /><strong id="registration-heading">참가 설정</strong></div></div>
           <div className={styles.optionRows}>
             <label><span><UsersRound size={17} strokeWidth={1.8} />정원</span><input id="event-capacity" type="number" min="1" value={capacity} onChange={inputEvent => setCapacity(inputEvent.target.value)} placeholder="무제한" /></label>
             <label><span><Check size={17} strokeWidth={1.8} />승인 방식</span><select id="event-approval" value={approvalMode} onChange={inputEvent => setApprovalMode(inputEvent.target.value as 'auto' | 'manual')}><option value="auto">자동 승인</option><option value="manual">수동 승인</option></select></label>
             <label className={styles.checkboxRow}><span>참가 신청 받기</span><input type="checkbox" checked={registrationEnabled} onChange={inputEvent => setRegistrationEnabled(inputEvent.target.checked)} /></label>
           </div>
           <details className={styles.advanced}><summary>신청 기간 설정 <span>{registrationOpenAt || registrationCloseAt ? '설정됨' : '기본값'}</span></summary><div className={styles.advancedGrid}><label>신청 시작<input type="datetime-local" value={registrationOpenAt} onChange={inputEvent => setRegistrationOpenAt(inputEvent.target.value)} /></label><label>신청 마감<input type="datetime-local" value={registrationCloseAt} onChange={inputEvent => setRegistrationCloseAt(inputEvent.target.value)} /></label></div></details>
-        </section>
+          </section>
 
-        <details className={styles.questions} open={fieldsDraft.length > 0}><summary>신청 질문 <span>{fieldsDraft.length ? `${fieldsDraft.length}개` : '추가하지 않음'}</span></summary><div className={styles.questionsContent}><div className={styles.questionToolbar}><p>참가 신청 때 받을 정보를 추가할 수 있어요.</p><button type="button" className={styles.secondaryButton} onClick={() => setFieldsDraft([...fieldsDraft, { type: 'text', label: '', description: '', placeholder: '', required: false, optionsText: '' }])}>+ 질문 추가</button></div>{fieldsDraft.map((field, index) => <div key={index} className={styles.question}><div><strong>질문 {index + 1}</strong><button type="button" onClick={() => setFieldsDraft(fieldsDraft.filter((_, fieldIndex) => fieldIndex !== index))}>삭제</button></div><div className={styles.questionGrid}><label>유형<select value={field.type} onChange={inputEvent => updateField(index, { type: inputEvent.target.value as FieldType })}><option value="text">짧은 답변</option><option value="textarea">긴 답변</option><option value="select">선택</option><option value="checkbox">체크박스</option></select></label><label>질문<input required value={field.label} onChange={inputEvent => updateField(index, { label: inputEvent.target.value })} placeholder="예: 소속을 알려 주세요" /></label></div>{field.type === 'select' && <label>선택지<input required value={field.optionsText} placeholder="개발자:developer, 기획자:planner" onChange={inputEvent => updateField(index, { optionsText: inputEvent.target.value })} /></label>}<label className={styles.questionRequired}><input type="checkbox" checked={field.required} onChange={inputEvent => updateField(index, { required: inputEvent.target.checked })} />필수 질문</label></div>)}</div></details>
+          <details className={styles.questions} open={fieldsDraft.length > 0}><summary>신청 질문 <span>{fieldsDraft.length ? `${fieldsDraft.length}개` : '추가하지 않음'}</span></summary><div className={styles.questionsContent}><div className={styles.questionToolbar}><p>참가 신청 때 받을 정보를 추가할 수 있어요.</p><button type="button" className={styles.secondaryButton} onClick={() => setFieldsDraft([...fieldsDraft, { type: 'text', label: '', description: '', placeholder: '', required: false, optionsText: '' }])}>+ 질문 추가</button></div>{fieldsDraft.map((field, index) => <div key={index} className={styles.question}><div><strong>질문 {index + 1}</strong><button type="button" onClick={() => setFieldsDraft(fieldsDraft.filter((_, fieldIndex) => fieldIndex !== index))}>삭제</button></div><div className={styles.questionGrid}><label>유형<select value={field.type} onChange={inputEvent => updateField(index, { type: inputEvent.target.value as FieldType })}><option value="text">짧은 답변</option><option value="textarea">긴 답변</option><option value="select">선택</option><option value="checkbox">체크박스</option></select></label><label>질문<input required value={field.label} onChange={inputEvent => updateField(index, { label: inputEvent.target.value })} placeholder="예: 소속을 알려 주세요" /></label></div>{field.type === 'select' && <label>선택지<input required value={field.optionsText} placeholder="개발자:developer, 기획자:planner" onChange={inputEvent => updateField(index, { optionsText: inputEvent.target.value })} /></label>}<label className={styles.questionRequired}><input type="checkbox" checked={field.required} onChange={inputEvent => updateField(index, { required: inputEvent.target.checked })} />필수 질문</label></div>)}</div></details>
+        </section>
 
         {error && <p className={styles.error}>{error}</p>}
         <div className={styles.actions}><Link href={event ? `/admin/events/${event.id}` : '/admin'} className={styles.cancelButton}>취소</Link><div className={styles.saveGroup}><span>{event ? '변경사항은 공개 페이지에 바로 반영됩니다.' : '만든 즉시 공개 링크로 공유할 수 있어요.'}</span><button className={styles.saveButton} disabled={loading}>{loading ? '저장 중...' : event ? '변경사항 저장' : '이벤트 만들기'}</button></div></div>
       </main>
-    </EventExperienceLayout>
-    </form>
+      </EventExperienceLayout>
+      </form>
+    </EventCanvasFrame>
   </div>;
 }

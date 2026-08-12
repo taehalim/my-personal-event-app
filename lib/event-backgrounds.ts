@@ -7,25 +7,19 @@ export const EVENT_BACKGROUND_PRESETS = [
   { id: 'warp', label: '하이퍼스피드', description: '공간을 가르는 궤적' },
   { id: 'threads', label: '스레드', description: '유영하는 빛의 선' },
   { id: 'aurora', label: '오로라', description: '천천히 흐르는 빛' },
+  { id: 'midnight', label: '나이트', description: '고요한 밤의 그라데이션' },
+  { id: 'paper', label: '페이퍼', description: '따뜻하고 정적인 종이 질감' },
 ] as const;
 
 export type EventBackgroundPreset = typeof EVENT_BACKGROUND_PRESETS[number]['id'];
 
 const presetIds = new Set<string>(EVENT_BACKGROUND_PRESETS.map(preset => preset.id));
 
-// Pre-catalog events carried arbitrary legacy identifiers. They intentionally
-// no longer expose a stale visual; all of them resolve to the new free catalog.
-const legacyPresetFallback: Record<string, EventBackgroundPreset> = {
-  plain: 'galaxy',
-  constellation: 'warp',
-  orbit: 'threads',
-  bubbles: 'aurora',
-  sparkles: 'tunnel',
-  rain: 'plasma',
-  confetti: 'balatro',
-};
-
 export function normalizeBackgroundPreset(value: string | null | undefined): EventBackgroundPreset {
   if (value && presetIds.has(value)) return value as EventBackgroundPreset;
-  return value ? legacyPresetFallback[value] ?? 'galaxy' : 'galaxy';
+  return 'galaxy';
+}
+
+export function isDarkEventBackground(preset: EventBackgroundPreset) {
+  return preset !== 'aurora' && preset !== 'paper';
 }

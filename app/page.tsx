@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { LamaEvent } from '@/lib/types';
 import PublicEventsDirectory from '@/components/PublicEventsDirectory';
+import { displayNameForUser } from '@/lib/profile';
 
 async function getEvents() {
   const supabase = await createClient();
@@ -13,6 +14,9 @@ async function getEvents() {
 }
 
 export default async function HomePage() {
+  const supabase = await createClient();
   const events = await getEvents();
-  return <PublicEventsDirectory events={events} referenceNow={new Date().toISOString()} />;
+  const { data: { user } } = await supabase.auth.getUser();
+  const ownerName = events[0]?.host_name ?? displayNameForUser(user, '나');
+  return <PublicEventsDirectory events={events} referenceNow={new Date().toISOString()} ownerName={ownerName} />;
 }
