@@ -270,7 +270,84 @@ admin_users
 - RLS는 published 이벤트/공개 cover만 익명 읽기, 관리자는 created_by=auth.uid() 행만 CUD, registration 답변은 해당 관리자와 작성자만 접근하도록 한다.
 - 이메일은 등록·승인·거절·취소에만 발송한다. SMTP 비밀값은 서버 환경 변수에만 둔다.
 
-## 13. 완료 조건
+## 13. 외부 서비스 설정·배포
+
+이 절은 선택 안내가 아니라 제품을 동일하게 재현하기 위한 운영 계약이다. 개발자는 Supabase, Google, Vercel을 모두 설정해야 하며 비밀값은 저장소나 클라이언트 번들에 넣지 않는다.
+
+### 13.1 Supabase
+
+1. Supabase 프로젝트를 만들고 Project URL, Publishable Key, Secret Key를 발급한다.
+2. `supabase/migrations/0001_initial.sql`부터 최신 번호까지 순서대로 적용한다. CLI를 쓸 때는 프로젝트를 link한 뒤 `supabase db push`로 적용한다.
+3. Authentication에서 이메일/비밀번호 가입을 활성화한다. 운영 환경에서는 이메일 확인을 활성화한다.
+4. Authentication URL Configuration을 다음처럼 설정한다.
+   - Site URL: 실제 Vercel production origin. 예: `https://example.vercel.app`
+   - Redirect URLs: `https://example.vercel.app/auth/callback`, `http://localhost:3000/auth/callback`
+   - Vercel Preview에서 인증을 시험한다면 신뢰하는 preview origin의 `/auth/callback`도 추가한다. 무제한 wildcard는 사용하지 않는다.
+5. 회원가입한 사용자의 Auth UUID를 확인하고 관리자 권한을 부여한다.
+
+~~~sql
+insert into public.admin_users(user_id)
+values ('AUTH_USER_UUID')
+on conflict (user_id) do nothing;
+~~~
+
+6. `event-covers` Storage bucket, RLS, RPC, 테이블이 migration대로 생성되었는지 확인한다. Dashboard에서 RLS를 임의로 끄지 않는다.
+
+### 13.2 Google 계정과 Gmail SMTP
+
+Google 계정 설정은 이벤트 참가 신청·승인·거절·취소 메일을 Nodemailer로 발송하기 위해 필요하다.
+
+1. 발신 전용 Google 또는 Google Workspace 계정을 준비한다. 개인 계정과 분리된 서비스용 계정을 권장한다.
+2. Google 계정 보안에서 **2단계 인증**을 활성화한다. 앱 비밀번호의 제공 조건과 제한은 [Google 공식 도움말](https://support.google.com/accounts/answer/185833)을 따른다.
+3. [Google 앱 비밀번호](https://myaccount.google.com/apppasswords)에서 `My Personal Event App · Vercel` 같은 이름으로 앱 비밀번호를 만든다.
+4. 생성 직후 한 번만 보이는 16자리 값을 복사한다. 공백을 제거한 값을 `GMAIL_APP_PASSWORD`로 쓰며 Google 계정의 일반 로그인 비밀번호를 사용하지 않는다.
+5. `GMAIL_USER`는 위 앱 비밀번호를 만든 Google 계정의 전체 이메일 주소다.
+6. 앱 비밀번호 메뉴가 없다면 2단계 인증이 완료되었는지 확인한다. 조직 정책, Advanced Protection, 보안 키만 사용하는 2단계 인증 계정에서는 앱 비밀번호를 사용할 수 없을 수 있으므로 Workspace 관리자 정책을 조정하거나 별도 발신 계정을 사용한다.
+7. 비밀번호가 노출되거나 Google 계정 비밀번호를 변경했다면 기존 앱 비밀번호를 폐기하고 새로 발급해 Vercel과 필요한 SMTP 설정을 갱신한다.
+
+앱 내부 이벤트 메일과 Supabase Auth 메일은 별도 경로다.
+
+| 메일 | 발송 주체 | 필수 설정 |
+| --- | --- | --- |
+| 참가 신청·접수·승인·거절·취소 | Next.js/Nodemailer | Vercel의 `GMAIL_USER`, `GMAIL_APP_PASSWORD` |
+| 회원가입 확인·비밀번호 재설정 | Supabase Auth | Supabase Auth 이메일 설정 |
+
+- Supabase 기본 메일은 개발 검증에는 사용할 수 있지만 운영 발송량·신뢰성에는 제약이 있다. 운영에서는 Authentication의 Custom SMTP를 설정한다.
+- Gmail을 Supabase Custom SMTP에도 쓴다면 Vercel용과 분리된 `My Personal Event App · Supabase` 앱 비밀번호를 하나 더 만든다. SMTP host는 `smtp.gmail.com`, SSL port는 `465`, username은 전체 Gmail 주소, password는 해당 앱 비밀번호, sender email도 같은 계정으로 설정한다.
+- Gmail 개인 계정은 대량 이벤트 메일 서비스가 아니다. 발송 한도나 조직 정책을 넘는 규모가 되면 제품 코드를 SMTP provider-agnostic하게 유지한 채 전용 트랜잭션 메일 공급자로 교체한다.
+
+### 13.3 환경변수
+
+로컬은 `.env.example`을 `.env.local`로 복사하고 실제 값을 넣는다. Vercel은 Project Settings → Environment Variables에서 최소 Production 환경에 동일한 키를 등록한다.
+
+| 이름 | 공개 여부 | 값 |
+| --- | --- | --- |
+| `NEXT_PUBLIC_APP_URL` | 공개 | 실제 production origin, 끝 `/` 없음 |
+| `NEXT_PUBLIC_SUPABASE_URL` | 공개 | Supabase Project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | 공개 | Supabase Publishable Key |
+| `SUPABASE_SECRET_KEY` | 비밀 | Supabase Secret Key; 절대 `NEXT_PUBLIC_` 접두사를 붙이지 않음 |
+| `GMAIL_USER` | 서버 전용 | SMTP 발신 Gmail 전체 주소 |
+| `GMAIL_APP_PASSWORD` | 비밀 | 공백 없는 Google 앱 비밀번호 |
+
+- Production과 Preview 값을 의도적으로 구분한다. 특히 이메일 본문의 이벤트·취소 링크는 `NEXT_PUBLIC_APP_URL`을 사용하므로 production 값이 localhost나 preview URL이면 안 된다.
+- Vercel 환경변수 변경 후에는 새 deployment를 만들어야 적용된다.
+- `.env.local`, Supabase Secret Key, Gmail 앱 비밀번호는 커밋·로그·클라이언트 응답·스크린샷에 노출하지 않는다.
+
+### 13.4 Vercel 배포
+
+1. Git 저장소를 Vercel 프로젝트에 연결하고 Framework Preset은 Next.js, project root는 이 저장소 루트로 둔다.
+2. Node/package manager는 lockfile을 따르며 build command는 `npm run build`다.
+3. 제13.3절의 환경변수를 등록하고 production deployment를 실행한다.
+4. 배포된 production origin을 `NEXT_PUBLIC_APP_URL`과 Supabase Site URL/Redirect URLs에 반영한 뒤 다시 배포한다.
+5. 배포 후 다음 smoke test를 실행한다.
+   - `/`에서 공개 이벤트 목록과 대표 이미지가 보인다.
+   - `/signup`에서 표시 이름과 이메일로 가입하고 확인 메일 callback이 동작한다.
+   - 관리자 등록 후 `/admin`에 접근하고 이벤트를 생성하면 8자리 slug 공개 URL이 즉시 열린다.
+   - 대표 이미지 업로드와 공개 Storage URL이 동작한다.
+   - 테스트 참가 신청 후 Gmail 발송과 `email_deliveries.status = sent`를 확인한다.
+   - 가입된 이메일의 비밀번호 재설정 메일이 오고, 미가입 이메일은 `ACCOUNT_NOT_FOUND`로 처리된다.
+
+## 14. 완료 조건
 
 1. /에 한국어 공개 목록과 예정/지난 이벤트가 있으며 관리자 로그인 링크가 없다.
 2. 새 이벤트는 즉시 published, 공개 slug와 목록에서 확인된다. draft만 404다.
@@ -283,8 +360,10 @@ admin_users
 9. lint, type check, production build, 핵심 Playwright 플로우가 통과해야 한다.
 10. 같은 진행 중 이벤트가 `/`와 `/admin`에서 동일한 투명 카드, 빨간 점, `지금 진행 중`, 시작–종료 시각으로 보인다. 분홍 배경·빨간 카드 border·상태 pill이 없어야 한다.
 11. 예정/진행 중/지난/취소 상태와 긴 제목·긴 장소를 fixture로 두고 카드 높이, 말줄임, 저대비, 관리자 액션 위계를 screenshot으로 검증한다.
+12. Supabase production project와 Vercel production deployment가 연결되고 production origin으로 Auth callback, 공개 URL, Storage 이미지가 동작한다.
+13. Google 앱 비밀번호를 이용한 참가 관련 메일과 Supabase Auth의 가입 확인·비밀번호 재설정 메일을 실제 수신함에서 검증한다.
 
-## 14. 구현 금지
+## 15. 구현 금지
 
 - 공개와 편집에 서로 다른 배경 구현/scale/overlay를 두는 것
 - 문서 높이를 기준으로 확장되는 absolute 배경, 화면을 감싸는 흰/검정 card·보더
@@ -295,3 +374,5 @@ admin_users
 - main에 중복 참가 신청 폼을 만들거나 fixed left drawer를 쓰는 것
 - 레거시 preset, Pro React Bits, 유료 API, 무단 외부 이미지 의존성
 - RLS/정원/권한 검증을 클라이언트 조건문으로 대체하는 것
+- Google 계정 일반 비밀번호, Gmail 앱 비밀번호, Supabase Secret Key를 코드·문서·Git에 넣는 것
+- 참가 관련 Nodemailer와 Supabase Auth 메일을 같은 발송 경로라고 가정하는 것

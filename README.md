@@ -1,4 +1,4 @@
-# Lama
+# My Personal Event App
 
 직접 링크로 공유하는 AI 커뮤니티 이벤트 생성·참가 신청 MVP입니다.
 
@@ -16,7 +16,9 @@ npm run dev
 insert into public.admin_users(user_id) values ('AUTH_USER_UUID');
 ```
 
-Gmail SMTP를 사용하려면 2단계 인증과 앱 비밀번호를 설정하고 `GMAIL_USER`, `GMAIL_APP_PASSWORD`를 등록합니다. 이메일 환경변수가 없어도 참가 신청 자체는 성공하고 관리자 화면에는 발송 실패가 기록됩니다.
+Gmail SMTP를 사용하려면 Google 계정의 2단계 인증과 앱 비밀번호를 설정하고 `GMAIL_USER`, `GMAIL_APP_PASSWORD`를 등록합니다. 이메일 환경변수가 없어도 참가 신청 자체는 성공하고 관리자 화면에는 발송 실패가 기록됩니다. Supabase Auth의 가입 확인·비밀번호 재설정 메일은 별도 설정입니다.
+
+외부 서비스와 Google 계정의 전체 설정 절차는 [SPEC.md의 외부 서비스 설정·배포](./SPEC.md#13-외부-서비스-설정배포)를 따릅니다.
 
 ## 명령어
 
