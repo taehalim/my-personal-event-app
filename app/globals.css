@@ -48,9 +48,7 @@ button, input, textarea, select { font: inherit; }
 .admin-create-button:hover { text-decoration: underline; }
 .event-directory-card { display: grid; gap: 0; padding: 24px; border-radius: 12px; background: transparent; transition: background .2s ease, box-shadow .2s ease, opacity .2s ease; }
 .event-directory-card:hover { background: #f7f7f7; }
-.event-directory-card.is-live { background: #fffafa; box-shadow: inset 3px 0 0 #d92d20; }
-.event-directory-card.is-live:hover { background: #fff4f2; }
-.event-directory-card.is-live .event-directory-time { color: #b42318; }
+.event-directory-card.is-live:hover { background: #f7f7f7; }
 .event-directory-card.is-past { opacity: .5; }
 .event-directory-card.is-past:hover { opacity: .68; background: #f7f7f7; }
 .event-directory-card.is-past .event-directory-card-image { filter: grayscale(.95); }
@@ -59,6 +57,9 @@ button, input, textarea, select { font: inherit; }
 .event-directory-card-body { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 20px; height: 128px; }
 .event-directory-card-body:focus-visible { outline: 2px solid #171717; outline-offset: 4px; border-radius: 4px; }
 .event-directory-card-content { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; }
+.event-directory-time-row { display: flex; min-height: 18px; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.event-directory-live-state { display: inline-flex; align-items: center; gap: 6px; color: #b42318; font-size: 12px; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
+.event-directory-live-dot { width: 6px; height: 6px; border-radius: 999px; background: #d92d20; box-shadow: 0 0 0 3px rgba(217, 45, 32, .1); }
 .event-directory-time { color: var(--accent); font-size: 15px; font-weight: 650; letter-spacing: -.025em; }
 .event-directory-card h2 { display: block; width: 100%; overflow: hidden; margin: 8px 0 11px; font-size: clamp(20px, 2.5vw, 25px); line-height: 1.15; letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
 .event-directory-meta { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; margin: 0 0 6px; color: #8a8a8a; font-size: 14px; }
@@ -70,8 +71,8 @@ button, input, textarea, select { font: inherit; }
 .event-directory-card-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 16px; }
 .admin-manage-button { min-height: 36px; padding: 0 13px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 12px; }
 .admin-manage-button:hover { background: var(--accent-hover); }
-.admin-participants-button { min-height: 36px; padding: 0 13px; border-radius: 8px; background: var(--accent-soft); color: var(--accent-hover); font-size: 12px; }
-.admin-participants-button:hover { background: #e8e8e8; }
+.admin-participants-button { min-height: 36px; padding: 0 9px; border-radius: 8px; background: transparent; color: #666; font-size: 12px; }
+.admin-participants-button:hover { background: #f1f1f1; color: var(--accent); }
 .admin-copy-button { min-height: 36px; padding: 0 12px; border-radius: 8px; background: transparent; color: #666; font-size: 12px; }
 .admin-copy-button:hover { background: #f1f1f1; }
 .admin-copy-button span { display: inline-flex; align-items: center; }

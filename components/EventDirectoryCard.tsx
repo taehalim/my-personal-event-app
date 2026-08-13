@@ -4,7 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Check, Copy, MapPin, UsersRound } from 'lucide-react';
 import { publicCoverUrl } from '@/lib/formatting';
-import { formatEventLocation, formatEventStartTime, getEventDirectoryState } from '@/lib/event-directory';
+import {
+  formatEventLocation,
+  formatEventStartTime,
+  formatEventTimeRange,
+  getEventDirectoryState,
+} from '@/lib/event-directory';
 import type { LamaEvent } from '@/lib/types';
 
 type AdminActions = {
@@ -36,7 +41,15 @@ export default function EventDirectoryCard({
   return <article className={`event-directory-card is-${state}`}>
     <Link className="event-directory-card-body" href={href} aria-label={`${event.title} 공개 페이지 보기${liveLabel}`}>
       <div className="event-directory-card-content">
-        <time className="event-directory-time" dateTime={event.start_at}>{formatEventStartTime(event)}</time>
+        <div className="event-directory-time-row">
+          {state === 'live' && <span className="event-directory-live-state">
+            <span className="event-directory-live-dot" aria-hidden="true" />
+            지금 진행 중
+          </span>}
+          <time className="event-directory-time" dateTime={event.start_at}>
+            {state === 'live' ? formatEventTimeRange(event) : formatEventStartTime(event)}
+          </time>
+        </div>
         <h2>{event.title}</h2>
         <p className="event-directory-meta"><MapPin size={18} strokeWidth={1.8} /><span>{formatEventLocation(event)}</span></p>
         <p className="event-directory-meta"><UsersRound size={18} strokeWidth={1.8} /><span>{participantLabel}</span></p>

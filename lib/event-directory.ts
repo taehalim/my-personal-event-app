@@ -53,6 +53,23 @@ export function formatEventStartTime(event: LamaEvent) {
   }).format(new Date(event.start_at));
 }
 
+export function formatEventTimeRange(event: LamaEvent) {
+  const formatter = new Intl.DateTimeFormat('ko-KR', {
+    timeZone: event.timezone,
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  const startParts = formatter.formatToParts(new Date(event.start_at));
+  const endParts = formatter.formatToParts(new Date(event.end_at));
+  const startPeriod = startParts.find(part => part.type === 'dayPeriod')?.value;
+  const endPeriod = endParts.find(part => part.type === 'dayPeriod')?.value;
+  const endLabel = startPeriod === endPeriod
+    ? endParts.filter(part => part.type !== 'dayPeriod').map(part => part.value).join('').trim()
+    : formatter.format(new Date(event.end_at));
+
+  return `${formatter.format(new Date(event.start_at))}–${endLabel}`;
+}
+
 export function formatEventLocation(event: LamaEvent) {
   return event.location_type === 'online' ? '온라인' : event.location_name ?? '장소 미정';
 }
