@@ -4,6 +4,16 @@ A Korean-first event web app for individual hosts to create events, share public
 
 [한국어 README](./README.ko.md) · [Product and implementation specification](./SPEC.md)
 
+## Screenshots
+
+### Event directory
+
+![Public event directory](./docs/images/events-directory.jpg)
+
+| Public event page | Registration panel |
+| --- | --- |
+| ![Public event page with an animated theme](./docs/images/event-detail.jpg) | ![Registration panel opened on an event page](./docs/images/event-registration.jpg) |
+
 ## Features
 
 - Email/password sign-up, sign-in, and password recovery for hosts

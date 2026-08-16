@@ -4,6 +4,16 @@
 
 [English README](./README.md) · [제품 및 구현 명세](./SPEC.md)
 
+## 화면
+
+### 이벤트 목록
+
+![공개 이벤트 목록](./docs/images/events-directory.jpg)
+
+| 공개 이벤트 페이지 | 참가 신청 패널 |
+| --- | --- |
+| ![동적 테마가 적용된 공개 이벤트 페이지](./docs/images/event-detail.jpg) | ![이벤트 페이지에서 열린 참가 신청 패널](./docs/images/event-registration.jpg) |
+
 ## 주요 기능
 
 - 이메일·비밀번호 기반 관리자 회원가입, 로그인, 비밀번호 재설정
