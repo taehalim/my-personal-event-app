@@ -4,10 +4,10 @@ import { useMemo, useState } from 'react';
 import { CalendarDays } from 'lucide-react';
 import EventDirectoryCard from '@/components/EventDirectoryCard';
 import { groupEventsByDate } from '@/lib/event-directory';
-import type { LamaEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 
 type Tab = 'upcoming' | 'past';
-export default function PublicEventsDirectory({ events, referenceNow, ownerName }: { events: LamaEvent[]; referenceNow: string; ownerName: string }) {
+export default function PublicEventsDirectory({ events, referenceNow, ownerName }: { events: Event[]; referenceNow: string; ownerName: string }) {
   const [tab, setTab] = useState<Tab>('upcoming');
   const visibleEvents = useMemo(() => {
     const now = new Date(referenceNow);

@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
-import type { LamaEvent, RegistrationState } from '@/lib/types';
+import type { Event, RegistrationState } from '@/lib/types';
 
-export function registrationState(event: LamaEvent, approvedCount: number, now = new Date()): RegistrationState {
+export function registrationState(event: Event, approvedCount: number, now = new Date()): RegistrationState {
   if (event.status === 'cancelled') return 'cancelled';
   if (event.status !== 'published') return 'not_open';
   if (!event.registration_enabled) return 'closed';

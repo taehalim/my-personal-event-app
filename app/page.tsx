@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import type { LamaEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 import PublicEventsDirectory from '@/components/PublicEventsDirectory';
 import { displayNameForUser } from '@/lib/profile';
 
@@ -10,7 +10,7 @@ async function getEvents() {
     .select('*')
     .in('status', ['published', 'cancelled'])
     .order('start_at', { ascending: true });
-  return (data ?? []) as LamaEvent[];
+  return (data ?? []) as Event[];
 }
 
 export default async function HomePage() {

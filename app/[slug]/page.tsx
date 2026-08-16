@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { registrationState } from '@/lib/registration';
 import { appUrl, publicCoverUrl } from '@/lib/formatting';
-import type { LamaEvent, RegistrationField } from '@/lib/types';
+import type { Event, RegistrationField } from '@/lib/types';
 import RegistrationDrawer from '@/components/RegistrationDrawer';
 import EventBackground from '@/components/EventBackground';
 import EventCanvasFrame from '@/components/EventCanvasFrame';
@@ -30,10 +30,10 @@ async function getEvent(slug: string) {
     admin.from('registrations').select('name').eq('event_id', event.id).eq('status', 'approved').order('registered_at', { ascending: true }).limit(8),
   ]);
 
-  return { event: event as LamaEvent, fields: (fields ?? []) as RegistrationField[], approvedCount: count ?? 0, participants: (participantRows ?? []) as { name: string }[] };
+  return { event: event as Event, fields: (fields ?? []) as RegistrationField[], approvedCount: count ?? 0, participants: (participantRows ?? []) as { name: string }[] };
 }
 
-function formatDateParts(event: LamaEvent) {
+function formatDateParts(event: Event) {
   const dateLabel = new Intl.DateTimeFormat('ko-KR', {
     timeZone: event.timezone,
     year: 'numeric',
@@ -54,7 +54,7 @@ function formatDateParts(event: LamaEvent) {
   };
 }
 
-function getLocationSummary(event: LamaEvent) {
+function getLocationSummary(event: Event) {
   if (event.location_type === 'online') return { title: '온라인 이벤트', detail: '온라인 링크로 참여' };
 
   const parts = (event.location_name ?? '장소 미정').split(',').map(part => part.trim()).filter(Boolean);
@@ -65,7 +65,7 @@ function getLocationSummary(event: LamaEvent) {
   };
 }
 
-function getMapEmbedUrl(event: LamaEvent) {
+function getMapEmbedUrl(event: Event) {
   if (event.location_type !== 'in_person' || !event.location_name) return null;
   return `https://www.google.com/maps?q=${encodeURIComponent(event.location_name)}&output=embed`;
 }

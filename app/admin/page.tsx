@@ -2,7 +2,7 @@ import { requireAdminProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import AdminEventsDirectory from '@/components/AdminEventsDirectory';
-import type { LamaEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -15,6 +15,6 @@ export default async function AdminPage() {
     result.set(registration.event_id, (result.get(registration.event_id) ?? 0) + 1);
     return result;
   }, new Map<string, number>());
-  const enriched = (events ?? []).map(event => ({ ...(event as LamaEvent), count: counts.get(event.id) ?? 0 }));
+  const enriched = (events ?? []).map(event => ({ ...(event as Event), count: counts.get(event.id) ?? 0 }));
   return <AdminEventsDirectory events={enriched} referenceNow={new Date().toISOString()} ownerName={displayName} />;
 }

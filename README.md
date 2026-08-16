@@ -1,35 +1,133 @@
 # My Personal Event App
 
-직접 링크로 공유하는 AI 커뮤니티 이벤트 생성·참가 신청 MVP입니다.
+A Korean-first event web app for individual hosts to create events, share public links, collect registrations, and manage participants from one place.
 
-## 시작하기
+[한국어 README](./README.ko.md) · [Product and implementation specification](./SPEC.md)
+
+## Features
+
+- Email/password sign-up, sign-in, and password recovery for hosts
+- Event CRUD with automatically generated eight-character public URLs
+- In-person locations with maps or online attendance links
+- Markdown event descriptions and cover images
+- Static and animated page backgrounds with live create/edit previews
+- Automatic or manual approval, capacity limits, registration windows, and custom questions
+- Registration, cancellation, status management, and CSV export
+- Optional registration-status emails through Gmail SMTP
+- Public and administrative event directories with responsive mobile layouts
+
+## Tech stack
+
+- Next.js 16 App Router, React 19, and TypeScript
+- Supabase Auth, Postgres, Storage, and Row Level Security
+- Vercel deployment
+- React Hook Form, Zod, React Markdown, and MDX Editor
+- React Bits-derived backgrounds, Three.js/OGL, and tsParticles
+- Playwright, ESLint, and TypeScript checks
+
+## Prerequisites
+
+- A supported Node.js release: 22 LTS, 24 LTS, or 26+; and npm
+- A Supabase project
+- A Vercel account for deployment
+- Optional: a Google account with 2-Step Verification and a Gmail app password for transactional email
+
+## Local setup
 
 ```bash
+git clone <YOUR_REPOSITORY_URL>
+cd my-personal-event-app
 npm install
 cp .env.example .env.local
+```
+
+Fill in `.env.local`:
+
+```dotenv
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+SUPABASE_SECRET_KEY=...
+GMAIL_USER=...                  # optional
+GMAIL_APP_PASSWORD=...         # optional
+```
+
+`SUPABASE_SECRET_KEY` and the Gmail app password are server-only secrets. Never commit them or expose them through a `NEXT_PUBLIC_` variable.
+
+### Configure Supabase
+
+With the Supabase CLI linked, apply the checked-in migrations:
+
+```bash
+npx supabase login
+npx supabase link --project-ref <PROJECT_REF>
+npx supabase db push
+```
+
+Without the CLI, run the SQL files in `supabase/migrations/` in numeric order through the Supabase SQL Editor. The initial migration creates the public `event-covers` Storage bucket. Then configure Authentication URLs:
+
+- Site URL: `http://localhost:3000` locally; the production origin after deployment
+- Local redirect: `http://localhost:3000/auth/callback`
+- Production redirect: `https://<YOUR_DOMAIN>/auth/callback`
+
+Signing up creates an Auth user but does not grant administrator access automatically. Add each approved host's Auth UUID to `public.admin_users`:
+
+```sql
+insert into public.admin_users (user_id)
+values ('AUTH_USER_UUID');
+```
+
+Row Level Security then limits each administrator to events they created. Follow the external-service section in [SPEC.md](./SPEC.md) for the complete setup procedure.
+
+### Configure Gmail email (optional)
+
+Enable Google 2-Step Verification, create an app password, and set `GMAIL_USER` and `GMAIL_APP_PASSWORD`. The core event and registration flows still work without these values, but delivery attempts are recorded as failed. Supabase Auth confirmation and password-reset email uses the separate SMTP configuration in Supabase.
+
+### Start the app
+
+```bash
 npm run dev
 ```
 
-`.env.local`에 Supabase URL, Publishable Key, Secret Key를 입력합니다. Supabase SQL Editor에서 `supabase/migrations/0001_initial.sql`을 실행한 뒤 Auth에서 관리자 이메일·비밀번호 사용자를 만들고, 해당 UUID를 `admin_users`에 추가하세요.
+Open [http://localhost:3000](http://localhost:3000).
 
-```sql
-insert into public.admin_users(user_id) values ('AUTH_USER_UUID');
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Create a production build |
+| `npm run start` | Start the production server |
+| `npm run typecheck` | Check TypeScript types |
+| `npm run lint` | Run ESLint |
+| `npm run test:e2e` | Run Playwright end-to-end tests |
+
+## Deployment
+
+1. Push the repository to GitHub.
+2. Import it into Vercel.
+3. Add all required variables from `.env.example` to the Vercel Production environment.
+4. Set `NEXT_PUBLIC_APP_URL` to the production origin.
+5. Add the production Site URL and callback URL in Supabase Auth settings.
+6. Verify sign-up, sign-in, event creation, public links, registration, and cancellation on the deployed site.
+
+See [SPEC.md](./SPEC.md) for the complete product contract, service configuration, and visual verification criteria.
+
+## Repository structure
+
+```text
+app/                    Pages and API Route Handlers
+components/             Shared UI and event-experience components
+lib/                    Domain logic, validation, Supabase, and email
+supabase/migrations/    Database schema, functions, and RLS policies
+tests/e2e/              Playwright tests
+SPEC.md                 Product, design, and implementation contract
 ```
 
-Gmail SMTP를 사용하려면 Google 계정의 2단계 인증과 앱 비밀번호를 설정하고 `GMAIL_USER`, `GMAIL_APP_PASSWORD`를 등록합니다. 이메일 환경변수가 없어도 참가 신청 자체는 성공하고 관리자 화면에는 발송 실패가 기록됩니다. Supabase Auth의 가입 확인·비밀번호 재설정 메일은 별도 설정입니다.
+## Contributing and security
 
-외부 서비스와 Google 계정의 전체 설정 절차는 [SPEC.md의 외부 서비스 설정·배포](./SPEC.md#13-외부-서비스-설정배포)를 따릅니다.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a change and [SECURITY.md](./SECURITY.md) for vulnerability reports. Never post credentials or personal information in public issues.
 
-## 명령어
+## License
 
-```bash
-npm run typecheck
-npm run lint
-npm run build
-```
-
-## 배포
-
-Vercel에 저장소를 연결하고 `.env.example`의 환경변수를 Production에 등록합니다. `NEXT_PUBLIC_APP_URL`은 실제 Vercel URL이어야 합니다. Supabase Auth Redirect URL에도 해당 URL을 추가하세요.
-
-MIT License.
+The application code is available under the [MIT License](./LICENSE). Components derived from React Bits remain subject to the upstream MIT + Commons Clause terms described in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

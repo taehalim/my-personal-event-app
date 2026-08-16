@@ -10,7 +10,7 @@ import {
   formatEventTimeRange,
   getEventDirectoryState,
 } from '@/lib/event-directory';
-import type { LamaEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 
 type AdminActions = {
   eventHref: string;
@@ -20,7 +20,7 @@ type AdminActions = {
 };
 
 type EventDirectoryCardProps = {
-  event: LamaEvent;
+  event: Event;
   href: string;
   referenceNow: string;
   participantLabel: string;

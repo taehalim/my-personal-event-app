@@ -1,6 +1,6 @@
 # My Personal Event App 제품 명세
 
-> 이 문서는 My Personal Event App의 단일 구현 기준이다. 이 문서만 전달받은 개발자가 현재 제품을 재구현할 수 있어야 한다. 이전 PRD, 화면 캡처, 기존 코드와 충돌하면 이 문서를 우선한다.
+> 이 문서는 My Personal Event App의 단일 구현 기준이자 시각 회귀 계약이다. 이 문서만 전달받은 개발자가 별도 화면 캡처나 구두 설명 없이 현재 제품을 재구현할 수 있어야 한다. 이전 PRD, 화면 캡처, 기존 코드와 충돌하면 이 문서를 우선한다. 문장형 설명과 수치·컴포넌트 계약이 충돌하면 수치·컴포넌트 계약이 우선한다.
 
 ## 1. 제품
 
@@ -56,25 +56,78 @@ My Personal Event App은 주최자가 이벤트를 만들고, 가입 때 입력�
 ## 4. 전역 디자인 시스템
 
 - 모든 UI는 자연스러운 한국어, 기본 글꼴은 **Geist Sans**다.
-- 콘텐츠 최대 폭은 **960px**이다. 넓은 화면에서 이보다 넓게 퍼뜨리지 않는다.
+- 공개 상세·생성·수정의 이벤트 캔버스 최대 폭은 정확히 **900px**이다. 넓은 화면에서 이보다 넓게 퍼뜨리지 않는다.
 - 820px 이하는 한 열, 640px 이하는 약 16px 좌우 여백을 쓴다. 터치 컨트롤은 최소 44px이다.
 - 구분은 여백·타이포그래피·약한 명암을 우선한다. 큰 외곽 카드, 불필요한 border/divider, 화면 전체를 감싸는 흰/검정 컨테이너를 만들지 않는다.
 - 이벤트 제목만 큰 크기를 사용한다. 빈 상태와 관리 제목은 과장하지 않는다.
 - 배경 테마와 무관하게 hover/focus/disabled/위험 버튼의 텍스트 대비가 유지되어야 한다.
+
+### 필수 디자인 토큰
+
+다음 값은 권장치가 아니라 구현 상수다. 임의의 디자인 시스템 기본값으로 대체하지 않는다.
+
+| token | 값 | 용도 |
+| --- | --- | --- |
+| `--event-canvas-width` | `900px` | 공개 상세·생성·수정 공통 폭 |
+| `--event-section-heading-size` | `18px` | 일정·오시는 길/참여 방법·이벤트 소개 제목 |
+| `--event-section-heading-tracking` | `-.035em` | 위 섹션 제목 자간 |
+| desktop canvas gutter | `24px` | `width: min(900px, calc(100% - 48px))` |
+| tablet canvas | `min(calc(100% - 32px), 620px)` | `<=820px` |
+| mobile canvas | `min(calc(100% - 28px), 520px)` | `<=560px` |
+| canvas top/bottom | `40px / 96px` | tablet `32/80`, mobile `28/64` |
+| header→body | `40px` | tablet `32px`, mobile `28px` |
+| desktop columns | `232px minmax(0, 1fr)` | left rail / main |
+| desktop column gap | `32px` | 공개·생성·수정 동일 |
+| cover radius | `16px` | 1:1 대표 이미지 |
+| title | `clamp(34px, 3.8vw, 50px)` | weight 550, line-height 1.08, tracking `-.065em` |
+| body | `15px / 1.75` | 소개 본문 |
+
+기본 중립색은 foreground `#171717`, muted `#737373`, subtle surface `#f3f4f6`, danger `#b42318`을 사용한다. 밝고 어두운 이벤트 테마에서는 이 값을 직접 덮어쓰기보다 아래 `--canvas-*` 의미 토큰으로 변환한다.
+
+~~~css
+--canvas-bg;
+--canvas-fg;
+--canvas-muted;
+--canvas-placeholder;
+--canvas-control;
+--canvas-control-active;
+--canvas-line;
+--canvas-panel;
+~~~
+
+이벤트 화면의 제목·본문·입력·버튼은 위 토큰만 참조한다. 테마 컴포넌트 안에서 페이지별 색을 하드코딩하지 않는다.
 
 ### 공통 이벤트 캔버스
 
 공개/생성/수정은 다음 공통 레이아웃 계약을 사용한다.
 
 ~~~text
-desktop: [ left visual rail 220~250px ] [ right main flexible ]  gap 28~42px
+viewport-fixed EventBackground (inset: 0)
+└─ EventCanvasFrame (max 900px)
+   ├─ header: back link + optional admin actions
+   └─ EventExperienceLayout
+      ├─ aside: 232px
+      └─ main: minmax(0, 1fr)
+
+desktop: [ left visual rail 232px ] [ right main 636px ]  gap 32px
 mobile ≤820px: left rail 다음 right main의 한 열
-max width: 960px
+max width: 900px
 ~~~
 
-- EventExperienceLayout이 이 계약의 단일 컴포넌트다.
-- 생성·수정은 같은 캔버스에서 편집 필드를 보이고, 공개 페이지는 같은 데이터를 읽기 전용으로 보인다. 필드 UI는 달라도 콘텐츠 폭·열·배경 레이어의 구조는 같아야 한다.
+- `EventCanvasFrame`이 width, 상단 여백, 뒤로가기 위치, header→body 간격을 소유한다. 각 페이지가 이 값을 다시 선언하면 안 된다.
+- `EventExperienceLayout`이 열 수, 열 폭, gap, 반응형 전환을 소유한다. 공개와 편집 전용 grid를 별도로 만들면 안 된다.
+- 생성·수정은 같은 캔버스에서 편집 필드를 보이고, 공개 페이지는 같은 데이터를 읽기 전용으로 보인다. 공개와 편집에서 `EventBackground`, `EventCanvasFrame`, `EventExperienceLayout`, 대표 이미지 비율, 제목 크기, 섹션 제목 크기를 공유한다.
+- main의 읽기 순서는 공개와 편집 모두 `제목 → 일정 → 오시는 길/참여 방법 → 이벤트 소개 → 참가 신청 설정(편집만)`이다.
+- 편집 모드의 입력 컨트롤 때문에 내용 높이는 달라도 섹션 시작점·제목 위계·좌우 정렬선은 같아야 한다. `새 이벤트`, `이벤트 편집`, `필수 이벤트 설정`, `선택 이벤트 설정`, `참가자에게 보여질 기본 정보` 같은 별도 설명 heading을 본문에 추가하지 않는다.
 - 공개 페이지 left rail은 desktop에서 sticky일 수 있으나 참가 신청 폼을 연 동안에는 static으로 바꾼다. 중첩 스크롤바나 본문 겹침은 금지한다.
+
+### 공통 상단과 섹션 위계
+
+- 뒤로가기는 `ArrowLeft` 17px, stroke 1.8, 글자 14px, 아이콘-텍스트 gap 6px이다. 공개·생성·수정에서 같은 컴포넌트를 쓴다.
+- 제목 아래 첫 섹션까지 desktop 48px, 섹션 사이는 48px이다. mobile은 각각 38px이다.
+- 섹션 heading은 텍스트만 18px로 보인다. 일정·장소·소개 heading 앞에 큰 장식 아이콘이나 별도 카드 header를 붙이지 않는다. 필요한 아이콘은 날짜, 장소 등 실제 값 옆의 42~52px 중립 control에만 둔다.
+- 공개 본문과 편집 본문 모두 섹션 사이 divider를 사용하지 않는다.
+- border는 form control의 affordance가 꼭 필요한 경우에도 색 선보다 반투명 surface 차이로 표현한다. 화면 전체·섹션·대표 이미지 선택 패널을 감싸는 외곽 border는 금지한다.
 
 ## 5. 페이지 스타일(배경 효과)
 
@@ -89,22 +142,56 @@ max width: 960px
 - prefers-reduced-motion에서 애니메이션을 낮추거나 정지한다.
 - 무료 React Bits 컴포넌트만 프로젝트에 vendoring하여 쓴다. Pro 컴포넌트, 유료 API, CSS로 흉내 낸 오래된 효과를 사용하지 않는다.
 
-| id | 이름 | 유형 | 실제 배경 |
+| id | 표시 이름 / 설명 | tone | 컴포넌트와 고정 props |
 | --- | --- | --- | --- |
-| galaxy | 갤럭시 | 동적 | React Bits Galaxy |
-| balatro | 발라트로 | 동적 | React Bits Balatro |
-| prism | 프리즘 | 동적 | React Bits Prism |
-| plasma | 플라즈마 | 동적 | React Bits Plasma |
-| tunnel | 라이트 터널 | 동적 | React Bits Light Tunnel |
-| warp | 하이퍼스피드 | 동적 | React Bits Hyperspeed |
-| threads | 스레드 | 동적 | React Bits Threads |
-| aurora | 오로라 | 동적 | React Bits Aurora |
-| midnight | 나이트 | 정적 | 남색/검정 그라데이션 |
-| paper | 페이퍼 | 정적 | 따뜻한 종이 질감 |
+| galaxy | 갤럭시 / 회전하는 성운과 별 | dark | `Galaxy density=1.15 hueShift=215 starSpeed=.65 speed=.75 glowIntensity=.45 saturation=.85 mouseInteraction` |
+| balatro | 발라트로 / 유기적으로 흐르는 색 | dark | `Balatro color1=#ff4f92 color2=#7d63ff color3=#36d5c2 spinSpeed=.26 spinAmount=.7 contrast=2.2 lighting=.65 mouseInteraction` |
+| prism | 프리즘 / 회전하는 스펙트럼 | dark | `Prism animationType=3drotate glow=1.6 noise=.4 scale=3.2 hueShift=.16 colorFrequency=1.2 bloom=1.1 suspendWhenOffscreen timeScale=.55` |
+| plasma | 플라즈마 / 깊고 부드러운 에너지 | dark | `Plasma color=#596bff speed=.55 scale=1.05 opacity=.92 mouseInteractive renderScale=.6 targetFps=30` |
+| tunnel | 라이트 터널 / 빛을 통과하는 공간 | dark | `LightTunnel cableColor=#789cff pulseColor=#f4b9ff tunnelColor=#070914 speed=.48 pulseSpeed=.6 glow=.8 waviness=.45 sway=.18 grain mouseInteraction=false` |
+| warp | 하이퍼스피드 / 공간을 가르는 궤적 | dark | vendored free `Warp`의 기본 preset |
+| threads | 스레드 / 유영하는 빛의 선 | dark | `Threads color=[.46,.65,1] amplitude=1.45 distance=.15 enableMouseInteraction` |
+| aurora | 오로라 / 천천히 흐르는 빛 | light | `Aurora colorStops=[#8ec5ff,#eab8ff,#8ce5cd] amplitude=1.05 blend=.52 speed=.72` |
+| midnight | 나이트 / 고요한 밤의 그라데이션 | dark | 아래 고정 CSS |
+| paper | 페이퍼 / 따뜻하고 정적인 종이 질감 | light | 아래 고정 CSS |
 
-- aurora, paper는 밝은 테마, 나머지는 어두운 테마다.
-- 모든 색은 event-bg, event-fg, event-muted, event-control, event-action 의미 토큰으로 결정한다.
-- 과거 값 정규화: constellation→warp, orbit→threads, bubbles→aurora, sparkles→tunnel, rain→plasma, confetti→balatro, plain→galaxy; 그 외는 galaxy. 새 값은 위 10개만 저장한다.
+~~~css
+.event-background-midnight {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(92,103,173,.42), transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(180,103,153,.22), transparent 42%),
+    #0d0e16;
+}
+.event-background-paper {
+  background:
+    repeating-linear-gradient(0deg, rgba(110,84,54,.035) 0 1px, transparent 1px 7px),
+    radial-gradient(circle at 78% 12%, rgba(219,193,157,.32), transparent 34%),
+    #f3ede2;
+}
+~~~
+
+- 위 props와 정적 CSS는 시각 결과의 일부다. 라이브러리 예제의 최신 기본값이나 구현자의 취향으로 바꾸지 않는다.
+- 동적 컴포넌트는 클라이언트에서 `dynamic(..., { ssr:false })`로 로드한다. 하나의 `ReactBitsBackground` switch가 id와 컴포넌트를 매핑하며, 공개와 편집이 이 컴포넌트를 함께 쓴다.
+- 동적 배경 wrapper는 `background:transparent`, `filter:none`, `opacity:1`이다. `::before/::after`로 이전 효과를 겹치지 않는다.
+- `aurora`, `paper`만 light이고 나머지는 dark다. 유효하지 않은 값은 `galaxy`로 정규화한다. 레거시 id와 레거시 CSS 효과를 보존하지 않는다.
+- 모든 색은 제4절의 `--canvas-*` 의미 토큰으로 결정한다.
+
+### 무료 대표 이미지 manifest
+
+기본 이미지 8종도 제품 UI의 결정적 데이터다. 임의 placeholder, 랜덤 이미지 API, 다른 URL로 교체하지 않는다.
+
+| id / 라벨 | 고정 URL |
+| --- | --- |
+| mountain / 산책 | `https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=85` |
+| studio / 스튜디오 | `https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=85` |
+| coast / 해변 | `https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=85` |
+| forest / 숲 | `https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=85` |
+| ocean / 바다 | `https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1200&q=85` |
+| office / 함께 일하기 | `https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85` |
+| celebration / 축하 | `https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=85` |
+| conference / 무대 | `https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=85` |
+
+원격 URL 허용 목록은 `images.unsplash.com`만 허용한다. 업로드된 이미지는 public Supabase Storage URL 또는 event UUID 기반 경로여야 한다.
 
 ## 6. 공개 목록 /
 
@@ -188,15 +275,17 @@ max width: 960px
 
 ## 9. 이벤트 생성·수정
 
-생성과 수정은 하나의 EventForm과 960px 공통 이벤트 캔버스를 사용한다. 수정은 기존 값을 불러오며 제목·이미지·페이지 스타일·소개가 저장 전 즉시 반영된다.
+생성과 수정은 하나의 `EventForm`과 900px 공통 이벤트 캔버스를 사용한다. 수정은 기존 값을 불러오며 제목·이미지·페이지 스타일·소개가 저장 전 즉시 반영된다. 편집 화면은 관리자 대시보드 양식이 아니라 공개 이벤트 화면에 입력 affordance만 얹은 live preview다.
 
 ### 골격
 
-- 상단은 ← X의 이벤트. 수정에서는 공개 링크 보기, 참가자 관리, 이벤트 삭제를 충분한 대비로 둔다.
-- left rail은 실시간 대표 이미지, 대표 이미지, 페이지 스타일, 주최자 avatar/이름이다.
-- main은 새 이벤트/이벤트 편집, 제목 입력, 필수 이벤트 설정, 선택 이벤트 설정, 저장 바 순서다.
+- 상단은 공개 페이지와 동일한 크기·위치의 `← X의 이벤트`다. 수정에서만 우측에 공개 링크 보기, 참가자 관리, 이벤트 삭제를 충분한 대비의 text/ghost action으로 둔다.
+- left rail은 실시간 1:1 대표 이미지, `대표 이미지`, `페이지 스타일` 두 control, 열린 asset panel, 주최자 avatar/이름 순서다.
+- main은 큰 제목 입력 → 일정 → 오시는 길/참여 방법 → 이벤트 소개 → 접힌 참가 신청 설정 → 저장 action 순서다.
+- 공개 화면에 없는 `새 이벤트`, `이벤트 편집`, `필수 이벤트 설정`, `선택 이벤트 설정`, `참가자에게 보여질 기본 정보`, `입력 즉시 서식 반영` 같은 eyebrow/helper heading을 추가하지 않는다. 필요한 설명은 label의 accessible description 또는 control 가까이의 짧은 문장으로만 둔다.
+- 일정·오시는 길/참여 방법·이벤트 소개 heading은 공개 화면과 동일한 18px 텍스트 위계다. heading 앞 장식 아이콘은 쓰지 않는다.
 - form 전체를 큰 card, 외곽 border, 흰색 wrapper로 감싸지 않는다.
-- 하단 저장 바는 캔버스 안에만 있고 긴 폼을 가리거나 별도 스크롤을 만들지 않는다.
+- 하단 action은 일반 문서 흐름에 둔다. viewport sticky/fixed bar로 만들지 않고 긴 폼을 가리거나 별도 스크롤을 만들지 않는다.
 
 ### 대표 이미지·페이지 스타일
 
@@ -205,16 +294,17 @@ max width: 960px
 - 무료 기본 이미지 8개 라이브러리를 제공하며 선택 즉시 반영한다.
 - 페이지 스타일 패널은 제5절의 정확한 10개 preset을 이름·설명·미리보기와 함께 보인다.
 
-### 필수 이벤트 설정
+### 기본 정보 control
 
-1. **일정**: timezone은 Asia/Seoul. 시작/종료 날짜·시간을 각각 입력한다. 종료는 시작 뒤여야 하고, 시작 변경으로 무효가 되면 시작+1시간으로 보정한다.
-2. **장소**: 오프라인/온라인 segmented control. 오프라인은 장소명 필수, 온라인은 HTTPS URL 필수. 오프라인 입력 즉시 map preview와 Maps 링크를 보인다.
-3. **이벤트 소개**: 필수 Markdown 원문. 별도 작성/미리보기 토글 대신 MDXEditor 같은 WYSIWYG Markdown 에디터에서 입력 즉시 서식이 렌더된다.
+1. **일정**: timezone은 Asia/Seoul. 시작/종료를 두 행으로 두되 좁은 `시작`/`종료` card를 만들지 않는다. desktop 각 행은 `52px label | fluid date | 120px time`, gap 12px, input 높이 46px다. 종료는 시작 뒤여야 하고 시작 변경으로 무효가 되면 시작+1시간으로 보정한다.
+2. **장소**: 공개의 `오시는 길` 또는 `참여 방법` heading을 그대로 쓴다. 오프라인/온라인 segmented control은 내용 가까이에 작게 둔다. 오프라인은 장소명 필수, 온라인은 HTTPS URL 필수다. 오프라인 입력 즉시 동일한 본문 폭의 map preview와 Maps 링크를 보인다.
+3. **이벤트 소개**: 필수 Markdown 원문. 별도 작성/미리보기 토글 대신 MDXEditor WYSIWYG에서 입력 즉시 서식이 렌더된다. editor surface는 투명하고 본문 15px/1.75, 최소 높이 190px다.
 
-### 선택 이벤트 설정
+### 참가 신청 설정
 
-1. **참가 설정**: 참가 신청 on/off, 정원(빈 값=무제한), 자동/수동 승인, 선택적인 신청 기간.
-2. **신청 질문**: text/textarea/select/checkbox, 질문명, 필수 여부, 정렬, select 옵션.
+- 기본 상태에서는 `참가 신청 설정 · 선택 사항` summary 한 줄만 보인다. 별도 큰 section heading이나 card를 만들지 않는다.
+- 펼치면 참가 신청 on/off, 정원(빈 값=무제한), 자동/수동 승인, 선택적인 신청 기간을 보인다.
+- 신청 질문은 text/textarea/select/checkbox, 질문명, 필수 여부, 정렬, select 옵션을 지원한다.
 
 ### 저장·삭제
 
@@ -264,11 +354,59 @@ admin_users
 
 - Next.js 16 App Router, React 19, TypeScript
 - Supabase Auth/Postgres/Storage/SSR, Zod, Lucide, date/time utility
-- CSS Modules와 app/globals.css의 의미 토큰. Tailwind/shadcn/Radix를 전제로 하지 않는다.
+- 이벤트 UI는 CSS Modules와 `app/globals.css`의 의미 토큰으로 구현한다. 저장소에 Tailwind directive가 있더라도 이벤트 화면을 utility class나 shadcn/Radix 기본 테마로 재설계하지 않는다.
 - MDXEditor, react-markdown, remark-gfm, remark-breaks, rehype-sanitize, browser-image-compression, Nodemailer, Playwright
+- 아래 버전 범위를 그대로 설치하고 생성한 npm lockfile을 커밋한다. major/minor가 비슷한 대체 패키지, 다른 date picker, 다른 Markdown editor로 바꾸지 않는다.
 - Route Handler는 Zod로 input을 검증한다. 클라이언트 검증은 UX용이고 권한·정원·기간은 서버가 최종 검증한다.
 - RLS는 published 이벤트/공개 cover만 익명 읽기, 관리자는 created_by=auth.uid() 행만 CUD, registration 답변은 해당 관리자와 작성자만 접근하도록 한다.
 - 이메일은 등록·승인·거절·취소에만 발송한다. SMTP 비밀값은 서버 환경 변수에만 둔다.
+
+### 고정 패키지 manifest
+
+~~~json
+{
+  "dependencies": {
+    "@mdxeditor/editor": "^4.2.0",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.53.0",
+    "@tsparticles/react": "^4.3.2",
+    "@tsparticles/slim": "^4.3.2",
+    "browser-image-compression": "^2.0.2",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "geist": "^1.7.2",
+    "lucide-react": "^0.468.0",
+    "nanoid": "^5.0.9",
+    "next": "^16.3.0",
+    "nodemailer": "^9.0.5",
+    "ogl": "^1.0.11",
+    "postprocessing": "^6.39.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.62.0",
+    "react-markdown": "^10.1.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
+    "three": "^0.180.0",
+    "zod": "^4.0.10"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^22.15.21",
+    "@types/nodemailer": "^8.0.1",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@types/three": "^0.180.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.3.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3"
+  }
+}
+~~~
 
 ## 13. 외부 서비스 설정·배포
 
@@ -351,7 +489,7 @@ Google 계정 설정은 이벤트 참가 신청·승인·거절·취소 메일�
 
 1. /에 한국어 공개 목록과 예정/지난 이벤트가 있으며 관리자 로그인 링크가 없다.
 2. 새 이벤트는 즉시 published, 공개 slug와 목록에서 확인된다. draft만 404다.
-3. 생성/수정/공개는 같은 960px event canvas와 같은 viewport 기반 background preset을 쓴다.
+3. 생성/수정/공개는 같은 900px event canvas와 같은 viewport 기반 background preset을 쓴다.
 4. 모든 10개 preset은 전체 viewport를 채운다. 동적 8개는 무료 React Bits 효과이며 정적 2개도 외곽 흰 여백/보더가 없다.
 5. 긴 소개 글이 배경을 세로로 늘리거나 공개/편집의 배경 비율을 다르게 만들지 않는다.
 6. 신청 폼은 left rail에서만 열리고, 열려도 overlap/nested scrollbar가 없다.
@@ -376,3 +514,79 @@ Google 계정 설정은 이벤트 참가 신청·승인·거절·취소 메일�
 - RLS/정원/권한 검증을 클라이언트 조건문으로 대체하는 것
 - Google 계정 일반 비밀번호, Gmail 앱 비밀번호, Supabase Secret Key를 코드·문서·Git에 넣는 것
 - 참가 관련 Nodemailer와 Supabase Auth 메일을 같은 발송 경로라고 가정하는 것
+
+## 16. 결정적 재현 계약
+
+이 절은 “비슷한 앱”이 아니라 현재 제품과 같은 결과를 만들기 위한 구현·검수 순서다.
+
+### 필수 컴포넌트 경계
+
+다음 책임을 컴포넌트 하나씩이 단독 소유해야 한다. 이름은 달라도 되지만 책임을 페이지마다 복제하면 실패다.
+
+| 책임 | 단일 소유자 | 공개 | 생성 | 수정 |
+| --- | --- | --- | --- | --- |
+| 배경 id→효과, props, tone | `EventBackground` + `ReactBitsBackground` | 사용 | 사용 | 사용 |
+| 900px 폭·gutter·상단 위치 | `EventCanvasFrame` | 사용 | 사용 | 사용 |
+| 232/636 2열·32px gap | `EventExperienceLayout` | 사용 | 사용 | 사용 |
+| 뒤로가기 모양과 위치 | `EventBackLink` 또는 Frame header | 사용 | 사용 | 사용 |
+| 대표 이미지 1:1 rail | 공통 cover primitive | 읽기 | 편집 preview | 편집 preview |
+| 제목 크기·행간·줄바꿈 | 공통 title primitive/token | 읽기 | input | input |
+| 일정 heading·정렬 | 공통 schedule primitive/token | 읽기 | input | input |
+| 오시는 길/참여 방법 heading·정렬 | 공통 location primitive/token | 읽기 | input | input |
+| 소개 typography | 공통 prose token | react-markdown | MDXEditor | MDXEditor |
+
+페이지 컴포넌트가 `max-width`, grid columns, background scale, title font-size, back-link font-size를 직접 다시 선언하면 이 계약을 위반한 것이다.
+
+### 고정 DOM 순서
+
+~~~text
+EventBackground
+EventCanvasFrame
+  header
+    back link
+    admin actions?             # 수정만
+  EventExperienceLayout
+    aside
+      cover
+      cover/style controls?    # 생성·수정만
+      host
+      participants?            # 공개만
+      registration CTA/form?   # 공개만
+    main
+      title
+      schedule
+      location/online method
+      description
+      registration settings?   # 생성·수정만, 기본 접힘
+      save actions?            # 생성·수정만, 문서 흐름
+~~~
+
+### 검수 fixture
+
+최소 다음 상태를 같은 데이터로 공개·생성·수정에 각각 렌더하여 비교한다.
+
+1. 52자 이상 긴 한글 제목, 오프라인 장소, 12문단 Markdown, `galaxy`, 참가자 0명.
+2. 두 줄 영문/한글 혼합 제목, 온라인 HTTPS 링크, 짧은 소개, `paper`, 참가자 8명 이상.
+3. 대표 이미지 없음, 오프라인 긴 장소명, `warp`, 참가 신청 닫힘.
+4. 각 10개 preset의 생성 live preview와 저장 후 공개 페이지.
+
+### 픽셀 검수
+
+- viewport 1440px에서 공개·생성·수정의 canvas bounding box는 모두 `900px`, left rail은 `232px`, column gap은 `32px`여야 한다.
+- 동일 preset·동일 viewport에서는 background wrapper의 `getBoundingClientRect()`가 공개·생성·수정 모두 `{x:0,y:0,width:viewportWidth,height:viewportHeight}`다.
+- 공개·생성·수정의 back link x/y 오차는 1px 이내, 제목 main 시작 x 오차는 1px 이내다.
+- 공개와 편집의 일정·오시는 길/참여 방법·이벤트 소개 heading은 computed `font-size:18px`이며 같은 x 좌표에서 시작한다.
+- 820px 이하에서는 세 화면 모두 한 열이며 좌우 16px, 560px 이하에서는 좌우 14px 여백을 유지한다.
+- dark/light 각각에서 본문, CTA, disabled, hover, focus 텍스트가 WCAG AA 대비를 만족한다.
+- Playwright screenshot은 animation을 freeze하거나 같은 deterministic seed/time을 사용한다. 동적 배경 프레임 차이를 layout 회귀로 오판하지 않는다.
+
+### 완료 전 기계 검증
+
+~~~text
+npm run lint
+npm run build
+Playwright: /, /admin, /admin/events/new, /admin/events/:id, /:slug
+1440px + 390px screenshot matrix
+~~~
+
+구현자는 완료 보고 전에 제14절과 이 절을 항목별로 확인한다. “깔끔한 UI”, “적절한 간격”, “레퍼런스와 비슷함” 같은 주관적 판단만으로 완료 처리하지 않으며, 반드시 이 문서에 정의된 수치·상태·동작과 검증 절차를 기준으로 판정한다.

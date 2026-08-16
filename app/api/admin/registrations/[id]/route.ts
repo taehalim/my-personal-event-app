@@ -3,7 +3,7 @@ import { getAdmin } from '@/lib/auth';
 import { sendRegistrationEmail } from '@/lib/email';
 import { newCancelToken, tokenHash } from '@/lib/registration';
 import { createAdminClient } from '@/lib/supabase/admin';
-import type { LamaEvent, RegistrationStatus } from '@/lib/types';
+import type { Event, RegistrationStatus } from '@/lib/types';
 
 const allowed: Record<string, RegistrationStatus[]> = {
   pending: ['approved', 'rejected'],
@@ -38,7 +38,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const emailType = status === 'approved' ? 'registration_approved' : status === 'rejected' ? 'registration_rejected' : 'registration_cancelled';
   let emailStatus = 'sent';
   try {
-    await sendRegistrationEmail(emailType, event as LamaEvent, { name: registration.name, email: registration.email, cancelToken });
+    await sendRegistrationEmail(emailType, event as Event, { name: registration.name, email: registration.email, cancelToken });
   } catch {
     emailStatus = 'failed';
   }

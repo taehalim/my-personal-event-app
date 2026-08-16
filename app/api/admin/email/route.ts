@@ -3,7 +3,7 @@ import { getAdmin } from '@/lib/auth';
 import { sendRegistrationEmail } from '@/lib/email';
 import { newCancelToken, tokenHash } from '@/lib/registration';
 import { createAdminClient } from '@/lib/supabase/admin';
-import type { LamaEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 
 const emailTypes = ['registration_approved', 'registration_pending', 'registration_rejected', 'registration_cancelled'] as const;
 
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   let status = 'sent';
   let errorMessage: string | null = null;
   try {
-    await sendRegistrationEmail(emailType, event as LamaEvent, { name: registration.name, email: registration.email, cancelToken });
+    await sendRegistrationEmail(emailType, event as Event, { name: registration.name, email: registration.email, cancelToken });
   } catch (error) {
     status = 'failed';
     errorMessage = error instanceof Error ? error.message : '발송 실패';

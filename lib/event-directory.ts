@@ -1,4 +1,4 @@
-import type { LamaEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 
 export type EventDirectoryState = 'upcoming' | 'live' | 'past' | 'cancelled';
 
@@ -9,12 +9,12 @@ export type LocalEventDate = {
   key: string;
 };
 
-export type EventDay<T extends LamaEvent = LamaEvent> = {
+export type EventDay<T extends Event = Event> = {
   date: LocalEventDate;
   events: T[];
 };
 
-export function localEventDateParts(event: LamaEvent): LocalEventDate {
+export function localEventDateParts(event: Event): LocalEventDate {
   const parts = new Intl.DateTimeFormat('ko-KR', {
     timeZone: event.timezone,
     year: 'numeric',
@@ -32,7 +32,7 @@ export function localEventDateParts(event: LamaEvent): LocalEventDate {
   };
 }
 
-export function groupEventsByDate<T extends LamaEvent>(events: T[]): EventDay<T>[] {
+export function groupEventsByDate<T extends Event>(events: T[]): EventDay<T>[] {
   const groups = new Map<string, EventDay<T>>();
 
   for (const event of events) {
@@ -45,7 +45,7 @@ export function groupEventsByDate<T extends LamaEvent>(events: T[]): EventDay<T>
   return [...groups.values()];
 }
 
-export function formatEventStartTime(event: LamaEvent) {
+export function formatEventStartTime(event: Event) {
   return new Intl.DateTimeFormat('ko-KR', {
     timeZone: event.timezone,
     hour: 'numeric',
@@ -53,7 +53,7 @@ export function formatEventStartTime(event: LamaEvent) {
   }).format(new Date(event.start_at));
 }
 
-export function formatEventTimeRange(event: LamaEvent) {
+export function formatEventTimeRange(event: Event) {
   const formatter = new Intl.DateTimeFormat('ko-KR', {
     timeZone: event.timezone,
     hour: 'numeric',
@@ -70,11 +70,11 @@ export function formatEventTimeRange(event: LamaEvent) {
   return `${formatter.format(new Date(event.start_at))}–${endLabel}`;
 }
 
-export function formatEventLocation(event: LamaEvent) {
+export function formatEventLocation(event: Event) {
   return event.location_type === 'online' ? '온라인' : event.location_name ?? '장소 미정';
 }
 
-export function getEventDirectoryState(event: LamaEvent, referenceNow: string): EventDirectoryState {
+export function getEventDirectoryState(event: Event, referenceNow: string): EventDirectoryState {
   if (event.status === 'cancelled') return 'cancelled';
 
   const now = new Date(referenceNow).getTime();

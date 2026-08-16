@@ -5,9 +5,9 @@ import { useMemo, useState } from 'react';
 import { CalendarPlus } from 'lucide-react';
 import EventDirectoryCard from '@/components/EventDirectoryCard';
 import { groupEventsByDate } from '@/lib/event-directory';
-import type { LamaEvent } from '@/lib/types';
+import type { Event } from '@/lib/types';
 
-type AdminEvent = LamaEvent & { count: number };
+type AdminEvent = Event & { count: number };
 type Tab = 'upcoming' | 'past';
 export default function AdminEventsDirectory({ events, referenceNow, ownerName }: { events: AdminEvent[]; referenceNow: string; ownerName: string }) {
   const [tab, setTab] = useState<Tab>('upcoming');

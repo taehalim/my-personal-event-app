@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { addHours, format, parseISO } from 'date-fns';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 import { ArrowLeft, Check, Clock3, ImagePlus, Images, MapPin, Sparkles, UsersRound, Video } from 'lucide-react';
-import type { FieldType, LamaEvent, RegistrationField } from '@/lib/types';
+import type { FieldType, Event, RegistrationField } from '@/lib/types';
 import { publicCoverUrl } from '@/lib/formatting';
 import { EVENT_BACKGROUND_PRESETS, isDarkEventBackground, normalizeBackgroundPreset, type EventBackgroundPreset } from '@/lib/event-backgrounds';
 import { EVENT_COVER_LIBRARY } from '@/lib/cover-library';
@@ -66,7 +66,7 @@ function initialField(field: ExistingField): DraftField {
   return { type: field.type, label: field.label, description: field.description ?? '', placeholder: field.placeholder ?? '', required: field.required, optionsText: (field.options ?? []).map(option => `${option.label}:${option.value}`).join(', ') };
 }
 
-export default function EventForm({ event, fields, hostName: suppliedHostName }: { event?: LamaEvent; fields?: ExistingField[]; hostName?: string }) {
+export default function EventForm({ event, fields, hostName: suppliedHostName }: { event?: Event; fields?: ExistingField[]; hostName?: string }) {
   const router = useRouter();
   const [title, setTitle] = useState(event?.title ?? '');
   const [description, setDescription] = useState(event?.description ?? '');
