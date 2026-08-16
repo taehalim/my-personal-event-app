@@ -124,10 +124,6 @@ tests/e2e/              Playwright tests
 SPEC.md                 Product, design, and implementation contract
 ```
 
-## Contributing and security
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a change and [SECURITY.md](./SECURITY.md) for vulnerability reports. Never post credentials or personal information in public issues.
-
 ## License
 
 The application code is available under the [MIT License](./LICENSE). Components derived from React Bits remain subject to the upstream MIT + Commons Clause terms described in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

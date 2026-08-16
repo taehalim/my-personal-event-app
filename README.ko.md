@@ -124,10 +124,6 @@ tests/e2e/              Playwright 테스트
 SPEC.md                 제품·디자인·기술 구현 계약
 ```
 
-## 기여 및 보안
-
-기여 방법은 [CONTRIBUTING.md](./CONTRIBUTING.md), 취약점 제보 방법은 [SECURITY.md](./SECURITY.md)를 확인하세요. 공개 이슈에 비밀 키나 개인정보를 올리지 마세요.
-
 ## 라이선스
 
 앱 자체 코드는 [MIT License](./LICENSE)로 제공됩니다. React Bits에서 파생된 컴포넌트에는 별도의 MIT + Commons Clause 조건이 적용되며, 자세한 내용은 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)를 확인하세요.
